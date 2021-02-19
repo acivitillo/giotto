@@ -3,8 +3,9 @@ from typing import List
 
 from dominate.tags import _input, a, div, option, select, button
 
-from .base import Partial
-from .utils import svg, path
+from base import Partial
+from utils import svg, path
+from icons import Icon, IconSearch
 
 
 class Select(Partial):
@@ -37,6 +38,8 @@ class Select(Partial):
 
 
 class Input(Partial):
+    icon: Icon = IconSearch()
+
     def _to_tag(self):
 
         tag = div(_class="relative inline-flex")
@@ -48,21 +51,8 @@ class Input(Partial):
             ),
             placeholder="Search by name...",
         )
-        _svg = svg(
-            _class="w-4 h-5 absolute top-0 right-0 m-3 pointer-events-none",
-            xmlns="http://www.w3.org/2000/svg",
-            fill="none",
-            viewBox="0 0 24 24",
-            stroke="currentColor",
-        )
-        _path = path(
-            strokeLinecap="round",
-            strokeLinejoin="round",
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
-        )
-        _svg.add(_path)
         tag.add(input_)
-        tag.add(_svg)
+        tag.add(self.icon.to_tag())
         return tag
 
 

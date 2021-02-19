@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 from dominate.tags import div
 from pydantic import BaseModel
 
-from .utils import turbo_frame
+from utils import turbo_frame
 
 
 class Frame(BaseModel):
