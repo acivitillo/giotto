@@ -132,3 +132,5 @@ dmypy.json
 #NPM
 node_modules
 dist
+assets/package-lock.json
+assets/package.json
