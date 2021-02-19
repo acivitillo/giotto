@@ -1,10 +1,10 @@
 from typing import List
 
 
-from dominate.tags import _input, a, div, option, select, button
+from dominate.tags import _input, a, div, option, select, button, ul, li
 
 from base import Partial
-from utils import svg, path
+from utils import svg, path, turbo_frame
 from icons import Icon, IconSearch
 
 
@@ -77,3 +77,46 @@ class Button(Partial):
             ),
         )
         return tag
+
+
+class Tab(Partial):
+    name: str
+    body: Partial
+
+    def _to_tag(self):
+        return self.body._to_tag()
+
+class TabContainer(Partial):
+    tabs: List[Tab]
+### NEEDS TO BE CALCULATED SOMEHOW
+    clicked: Tab
+
+    def _to_tag(self):
+        _tag = div(_class="flex-1 w-44 ml-5 mt-10")
+        _style = div(_style='border-bottom: 2px solid #eaeaea')
+        _ul = ul(_class='flex cursor-pointer')
+        # DEFAULT FIRST ONE CLICKED
+        if self.clicked == None:
+            self.clicked = self.tabs[0]
+            clicked_id = 0
+        else:
+            clicked_id = self.tabs.index(self.clicked)
+        for index,tab in enumerate(self.tabs):
+            if clicked_id == index:
+                _ul.add(li(tab.name,_class='py-2 px-6 bg-white rounded-t-lg'))
+            else:
+                _ul.add(li(tab.name,_class='py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200'))
+        _style.add(_ul)
+        _tag.add(_style)
+        ###  WE NEED TO APPEND TURBO FRAME
+        # _tag.add(turbo_frame(self.clicked, url=self.clicked.name))
+
+
+# USER CODE
+# tab_1 = Tab(name='apple', body=Table())
+# tab_2 = Tab(name='orange', body=Table())
+# tab_3 = Tab(name='banana', body=Hbox(values=[Button(name='add', color='green'),
+#                                              Button(name='remove', color='red'),
+#                                              Table()]))
+
+# tab_container_1 = TabContainer(tabs=[tab1, tab2, tab3])
