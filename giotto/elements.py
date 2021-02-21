@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Any
 
 
 from dominate.tags import _input, a, div, option, select, button, ul, li
 
-from base import Partial
-from utils import svg, path, turbo_frame
-from icons import Icon, IconSearch
+from .base import Partial
+from .utils import svg, path, turbo_frame
+from .icons import Icon, IconSearch
 
 
 class Select(Partial):
@@ -14,7 +14,7 @@ class Select(Partial):
     def _to_tag(self):
         tag = div(_class="relative inline-flex")
         _svg = svg(
-            _class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none",
+            _class="w-4 h-3 absolute top-0 right-0 m-4 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             viewBox="0 0 412 232",
         )
@@ -27,8 +27,8 @@ class Select(Partial):
         _svg.add(path(d=d, fill="#648299", fill_rule="nonzero"))
         tag.add(_svg)
         _class = (
-            "border border-gray-300 text-gray-600 h-10 pl-5 pr-10 bg-white"
-            " hover:border-gray-400 focus:outline-none appearance-none"
+            "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
+            " hover:border-gray-400 focus:outline-none appearance-none mt-1"
         )
         _select = select(_class=_class)
         for text in self.options:
@@ -46,13 +46,23 @@ class Input(Partial):
         input_ = _input(
             type="search",
             _class=(
-                "border border-gray-300 text-gray-600 h-10 pl-5 pr-10 bg-white"
-                " hover:border-gray-400 focus:outline-none appearance-none"
+                "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
+                " hover:border-gray-400 focus:outline-none appearance-none mt-1"
             ),
             placeholder="Search by name...",
         )
         tag.add(input_)
         tag.add(self.icon.to_tag())
+        return tag
+
+
+class Box(Partial):
+    contents: List[Any]
+
+    def _to_tag(self):
+        tag = div()
+        for item in self.contents:
+            tag.add(item)
         return tag
 
 
@@ -67,12 +77,17 @@ class TableAction(Partial):
 class Button(Partial):
     value: str
     color: str = "blue"
+    action: str
+    name: str = ""
 
     def _to_tag(self):
         tag = button(
             self.value,
+            data_controller="swapurl",
+            data_action=f"click->swapurl#{self.action}",
+            data_swapurl_name_value=self.name,
             _class=(
-                f"uppercase px-8 py-2 bg-{self.color}-500 text-blue-50"
+                f"uppercase mt-1 px-8 py-2 bg-{self.color}-500 text-blue-50"
                 " max-w-max shadow-sm hover:shadow-lg"
             ),
         )
@@ -86,26 +101,29 @@ class Tab(Partial):
     def _to_tag(self):
         return self.body._to_tag()
 
+
 class TabContainer(Partial):
     tabs: List[Tab]
-### NEEDS TO BE CALCULATED SOMEHOW
+    ### NEEDS TO BE CALCULATED SOMEHOW
     clicked: Tab
 
     def _to_tag(self):
         _tag = div(_class="flex-1 w-44 ml-5 mt-10")
-        _style = div(_style='border-bottom: 2px solid #eaeaea')
-        _ul = ul(_class='flex cursor-pointer')
+        _style = div(_style="border-bottom: 2px solid #eaeaea")
+        _ul = ul(_class="flex cursor-pointer")
         # DEFAULT FIRST ONE CLICKED
         if self.clicked == None:
             self.clicked = self.tabs[0]
             clicked_id = 0
         else:
             clicked_id = self.tabs.index(self.clicked)
-        for index,tab in enumerate(self.tabs):
+        for index, tab in enumerate(self.tabs):
             if clicked_id == index:
-                _ul.add(li(tab.name,_class='py-2 px-6 bg-white rounded-t-lg'))
+                _ul.add(li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg"))
             else:
-                _ul.add(li(tab.name,_class='py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200'))
+                _ul.add(
+                    li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200")
+                )
         _style.add(_ul)
         _tag.add(_style)
         ###  WE NEED TO APPEND TURBO FRAME

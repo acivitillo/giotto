@@ -8,9 +8,11 @@ module.exports = {
                 'light-blue': colors.lightBlue,
                 cyan: colors.cyan,
                 dark: '#444',
+                cgrey_200: '#919191',
+                cgrey_300: '444444e1',
                 light: '#f8f9fa',
                 white: '#fff',
-                orange: '#e98300'
+                orange: '#e98300',
             },
         },
     },

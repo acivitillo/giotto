@@ -3,12 +3,30 @@ from typing import List
 
 from dominate.tags import _input, a, div, option, select, button
 
-from base import Partial
-from utils import svg, path
+from .base import Partial
+from .utils import svg, path
 
 
 class Icon(Partial):
     pass
+
+
+class IconHMenu(Icon):
+    def _to_tag(self):
+        tag = svg(
+            xmlns="http://www.w3.org/2000/svg",
+            fill="none",
+            viewBox="0 0 24 28",
+            stroke="currentColor",
+        )
+        _path = path(
+            color="white",
+            strokeLinecap="round",
+            strokeLinejoin="round",
+            d="M4 6h16M4 12h16M4 18h16",
+        )
+        tag.add(_path)
+        return tag
 
 
 class IconDownarrow(Icon):
