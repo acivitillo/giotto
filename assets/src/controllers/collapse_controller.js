@@ -5,11 +5,14 @@ export default class extends Controller {
     static targets = ["levelone", "leveltwo"];
 
     unhide() {
-        var bgColor = "bg-cgrey_200"
-        if (this.leveloneTarget.classList.contains(bgColor)) {
-            this.leveloneTarget.classList.remove("bg-cgrey_200")
+        if (this.leveloneTarget.classList.contains("border-b-2")) {
+            this.leveloneTarget.classList.remove("border-b-2")
+            this.leveloneTarget.classList.add("border-r-4")
+            this.leveloneTarget.classList.add("hover:bg-cgrey_200")
         } else {
-            this.leveloneTarget.classList.add("bg-cgrey_200")
+            this.leveloneTarget.classList.remove("hover:bg-cgrey_200")
+            this.leveloneTarget.classList.remove("border-r-4")
+            this.leveloneTarget.classList.add("border-b-2")
         }
         this.leveltwoTargets.forEach(element => {
             if (element.classList.contains("hidden")) {

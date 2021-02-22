@@ -52,11 +52,8 @@ class Template(BaseModel):
         tag = self._to_tag()
         return tag
 
-    def _to_html(self):
-        pass
-
     def to_html(self):
-        content = self._to_tag()
+        content = self.to_tag()
         h = self.head
         b = self.body
         doc = self.doc
@@ -69,6 +66,7 @@ class Template(BaseModel):
 
 
 class AppLayout(Template):
+    sidebar: Sidebar
     content: List[BaseModel]
 
     @property
@@ -81,8 +79,8 @@ class AppLayout(Template):
     @property
     def _content(self):
         tag = div(_class="flex overflow-hidden")
-        sidebar = Sidebar().to_tag()
-        tag.add(sidebar)
+        # sidebar = Sidebar().to_tag()
+        tag.add(self.sidebar.to_tag())
         return tag
 
     def _to_tag(self):
@@ -90,7 +88,6 @@ class AppLayout(Template):
         _main = main(_class="flex flex-1 flex-col p-3")
         for item in self.content:
             _main.add(item.to_tag())
-
         tag.add(_main)
         return tag
 

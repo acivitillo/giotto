@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 from dominate.tags import div, nav, ul, li, a, h1, img, aside, span
 
 from .icons import IconHMenu, IconFiles
@@ -35,24 +36,13 @@ class TopBar(BaseModel):
         return tag
 
 
-items = [
-    {
-        "text": "A header",
-        "href": "#",
-        "subheaders": [
-            {"text": "a subheader", "href": "#"},
-            {"text": "a subheader", "href": "#"},
-        ],
-    },
-    {"text": "A second header", "href": "#"},
-]
-
-
 class Sidebar(BaseModel):
+    items: List
+
     def to_tag(self):
         tag = aside(_class="hidden md:flex bg-dark w-44 h-screen pt-5 sm:mt-0")
         _nav = nav()
-        for item in items:
+        for item in self.items:
             _item = div(data_action="click->collapse#unhide", data_controller="collapse")
             lev1 = a(
                 _class=(
@@ -70,11 +60,11 @@ class Sidebar(BaseModel):
             if "subheaders" in item:
                 for subitem in item["subheaders"]:
                     lev2 = a(
-                        _class="flex w-44 items-center py-2 pl-10 text-white bg-cgrey_200 hidden hover:text-dark",
+                        _class="flex w-44 items-center py-2 pl-10 text-white bg-cgrey_200 hidden hover:text-dark border-t-2",
                         href="#",
                         data_collapse_target="leveltwo",
                     )
-                    _span = span(subitem["text"], _class="mx-4 font-medium")
+                    _span = span(subitem["text"], _class="mx-4")
                     lev2.add(_span)
                     lev1.add(lev2)
             _item.add(lev1)

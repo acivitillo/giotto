@@ -10,6 +10,7 @@ from giotto.navigation import TopBar, Sidebar
 from giotto.utils import turbo_frame
 
 from giotto.templates import FrameTemplate, AppLayout
+import mockapis
 
 app = FastAPI()
 
@@ -19,7 +20,7 @@ btn_back = Button(value="go back", action="reset")
 sel_fruit = Select(options=["oranges"])
 explain_frame = Box(
     contents=[
-        h1("The stuff inside the border is a frame. Click the button to see how the frame works")
+        h1("Everything inside the border is a frame. Click the button to see how the frame works")
     ]
 )
 inp = Input()
@@ -47,7 +48,6 @@ class FiltersFrame(FrameTemplate):
             )
             return tag.render()
         elif name == "step2":
-            print("test!!!!")
             tag.add(h1("You see? Now we changed the frame again - only this text ;)"))
             return tag.render()
         else:
@@ -60,6 +60,7 @@ class FiltersFrame(FrameTemplate):
 # Page
 class TestAppLayout(AppLayout):
     route = "/testapp"
+    sidebar = Sidebar(items=mockapis.sidebar_items)
     content: List[BaseModel] = [FiltersFrame(), btn1, btn2, btn_back]
 
 
