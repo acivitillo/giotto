@@ -6,6 +6,8 @@ from .icons import IconHMenu, IconFiles
 
 
 class TopBar(BaseModel):
+    value: str = "Site Name"
+
     def to_tag(self):
         tag = div(_class="flex-1 flex flex-col")
         n = nav(_class="px-4 flex justify-between bg-dark h-16 border-b-2 border-cgrey_200")
@@ -18,14 +20,14 @@ class TopBar(BaseModel):
         uleft.add(l)
         ucenter = ul(_class="flex items-center")
         l = li()
-        l.add(h1("Site Name", _class="pl-8 lg:pl-0 text-white font-bold"))
+        l.add(h1(self.value, _class="pl-8 lg:pl-0 text-white font-bold"))
         ucenter.add(l)
         uright = ul(_class="flex items-center")
         l = li(_class="h-10 w-10")
         im = img(
             _class="h-full w-full rounded-full mx-auto",
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
-            alt="profile woman",
+            src="https://avatars.githubusercontent.com/u/54931660?s=400&u=dcf5550498aee3550f2b2f835345d802fabe1833&v=4&_sm_au_=iNVf4trk1MFNLSNnVsBFjK664v423",
+            alt="profile boss",
         )
         l.add(im)
         uright.add(l)
