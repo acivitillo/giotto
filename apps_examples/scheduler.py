@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from giotto.elements import Box, Input, Text
+from giotto.elements import Box, Input, Text, Table
 from giotto.navigation import Sidebar
 from giotto.templates import AppLayout
 import mockapis
@@ -10,7 +10,9 @@ import mockapis
 
 title = Text(value="Scheduler App")
 inp = Input(placeholder="Search Job...")
-content = Box(contents=[title, inp])
+table = Table(data=mockapis.jobs['data'])
+content = Box(contents=[title, inp, table])
+
 
 
 # Page

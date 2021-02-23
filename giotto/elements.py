@@ -1,7 +1,8 @@
-from typing import List, Any
+from typing import List, Any, Optional, Dict
+from json2table import convert
 
-
-from dominate.tags import _input, a, div, h1, option, select, button, ul, li
+from dominate.tags import _input, a, div, h1, option, select, button, ul, li, table ,tr ,thead ,th, td, tbody
+from dominate.util import raw
 
 from .base import Partial
 from .utils import svg, path, turbo_frame
@@ -74,6 +75,30 @@ class TableAction(Partial):
         tag = a(href="#", _class="text-blue-400 hover:text-blue-600 underline")
         return tag
 
+class Table(Partial):
+    data: List[Dict]
+    name: Optional[str]
+    description: Optional[str]
+
+    def _to_tag(self):
+        tag = table(_class = 'min-w-full table-auto mt-2', _style = 'text-align: center')
+        _thead = thead(_class = 'justify-between border-2 border-dark')
+        _tbody = tbody()
+        for counter, row in enumerate(self.data):
+            _thr = tr(_class = 'bg-dark text-white')
+            if counter == 0:
+                for key,value in row.items():
+                    _th = th(key, _class = 'py-2 border-dark border-r-2')
+                    _thr.add(_th)
+                _thead.add(_thr)
+            _tr = tr(_class='hover:bg-cgrey_200')
+            for key,value in row.items():
+                _td = td(value, _class='border-2 border-dark justify-between')
+                _tr.add(_td)
+            _tbody.add(_tr)
+        tag.add(_thead)
+        tag.add(_tbody)
+        return tag
 
 class Button(Partial):
     description: str
@@ -93,7 +118,6 @@ class Button(Partial):
             ),
         )
         return tag
-
 
 class Text(Partial):
     value: str
