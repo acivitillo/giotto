@@ -57,15 +57,6 @@ class Partial(BaseModel):
     def render(self):
         return self.to_tag().render()
 
-    def to_html_jj(self):
-        import jinja2 as jj
-
-        jinja_env = jj.Environment(loader=jj.FileSystemLoader("templates"))
-        name = self.__class__.__name__.lower()
-        template = jinja_env.get_template(f"{name}.html")
-        html = template.render(**self.dict())
-        return html
-
     def _repr_html_(self):
         return self.render()
         # return self.to_html_jj()
