@@ -68,11 +68,12 @@ class Template(BaseModel):
 class AppLayout(Template):
     sidebar: Sidebar
     content: List[BaseModel]
+    site_name: str = "Site Name"
 
     @property
     def body(self):
         b = body()
-        topbar = TopBar().to_tag()
+        topbar = TopBar(value=self.site_name).to_tag()
         b.add(topbar)
         return b
 
