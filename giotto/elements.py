@@ -1,7 +1,24 @@
+from __future__ import annotations
 from typing import List, Any, Optional, Dict
-from json2table import convert
 
-from dominate.tags import _input, a, div, h1, option, select, button, ul, li, table ,tr ,thead ,th, td, tbody
+
+from dominate.tags import (
+    _input,
+    a,
+    div,
+    h1,
+    option,
+    select,
+    button,
+    ul,
+    li,
+    table,
+    tr,
+    thead,
+    th,
+    td,
+    tbody,
+)
 from dominate.util import raw
 
 from .base import Partial
@@ -69,38 +86,12 @@ class Box(Partial):
 
 
 class TableAction(Partial):
-    action_name: str
+    description: str
 
     def _to_tag(self):
-        tag = a(href="#", _class="text-blue-400 hover:text-blue-600 underline")
+        tag = a(self.description, href="#", _class="text-blue-400 hover:text-blue-600 underline")
         return tag
 
-class Table(Partial):
-    data: List[Dict]
-    name: Optional[str]
-    description: Optional[str]
-
-    def _to_tag(self):
-        tag = div(_class="container overflow-x-auto mx-auto mt-2")
-        _table = table()
-        _thead = thead(_class = 'justify-between border-2 border-dark')
-        _tbody = tbody()
-        for counter, row in enumerate(self.data):
-            _thr = tr(_class = 'bg-dark text-white')
-            if counter == 0:
-                for key, value in row.items():
-                    _th = th(key, _class = 'py-2 border-dark border-r-2')
-                    _thr.add(_th)
-                _thead.add(_thr)
-            _tr = tr(_class='hover:bg-cgrey_200')
-            for key, value in row.items():
-                _td = td(value, _class='border-2 border-dark text-center')
-                _tr.add(_td)
-            _tbody.add(_tr)
-        _table.add(_thead)
-        _table.add(_tbody)
-        tag.add(_table)
-        return tag
 
 class Button(Partial):
     description: str
@@ -120,6 +111,46 @@ class Button(Partial):
             ),
         )
         return tag
+
+
+class Table(Partial):
+    data: List[Dict]
+    name: Optional[str]
+    description: Optional[str]
+    actions: List[Button] = []
+
+    def _to_tag(self):
+        tag = div(_class="container overflow-x-auto mx-auto mt-2")
+        _table = table()
+        _thead = thead(_class="bg-primary border-l-2 border-r-2 border-gray-200 text-white")
+        _tbody = tbody()
+        for counter, row in enumerate(self.data):
+            # HEADER
+            _thr = tr(_class="bg-dark text-white border border-gray-200")
+            if counter == 0:
+                if self.actions:
+                    _th = th("Actions", _class="py-2 p-3", colspan=len(self.actions))
+                    _thr.add(_th)
+                for key, value in row.items():
+                    _th = th(key, _class="py-2 p-3")
+                    _thr.add(_th)
+                _thead.add(_thr)
+            # BODY
+            bg = "" if counter % 2 == 0 else "bg-gray-50"
+            _tr = tr(_class=f"{bg} hover:bg-cgrey_200 border border-gray-200")
+            for action in self.actions:
+                _td = td(_class="text-center p-2 border-0")
+                _td.add(action.to_tag())
+                _tr.add(_td)
+            for key, value in row.items():
+                _td = td(str(value), _class="text-center p-2 border-0")
+                _tr.add(_td)
+            _tbody.add(_tr)
+        _table.add(_thead)
+        _table.add(_tbody)
+        tag.add(_table)
+        return tag
+
 
 class Text(Partial):
     value: str
