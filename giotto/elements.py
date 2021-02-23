@@ -81,23 +81,25 @@ class Table(Partial):
     description: Optional[str]
 
     def _to_tag(self):
-        tag = table(_class = 'min-w-full table-auto mt-2', _style = 'text-align: center')
+        tag = div(_class="container overflow-x-auto mx-auto mt-2")
+        _table = table()
         _thead = thead(_class = 'justify-between border-2 border-dark')
         _tbody = tbody()
         for counter, row in enumerate(self.data):
             _thr = tr(_class = 'bg-dark text-white')
             if counter == 0:
-                for key,value in row.items():
+                for key, value in row.items():
                     _th = th(key, _class = 'py-2 border-dark border-r-2')
                     _thr.add(_th)
                 _thead.add(_thr)
             _tr = tr(_class='hover:bg-cgrey_200')
-            for key,value in row.items():
-                _td = td(value, _class='border-2 border-dark justify-between')
+            for key, value in row.items():
+                _td = td(value, _class='border-2 border-dark text-center')
                 _tr.add(_td)
             _tbody.add(_tr)
-        tag.add(_thead)
-        tag.add(_tbody)
+        _table.add(_thead)
+        _table.add(_tbody)
+        tag.add(_table)
         return tag
 
 class Button(Partial):
