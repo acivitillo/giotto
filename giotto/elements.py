@@ -1,7 +1,7 @@
 from typing import List, Any
 
 
-from dominate.tags import _input, a, div, option, select, button, ul, li
+from dominate.tags import _input, a, div, h1, option, select, button, ul, li
 
 from .base import Partial
 from .utils import svg, path, turbo_frame
@@ -38,6 +38,7 @@ class Select(Partial):
 
 
 class Input(Partial):
+    placeholder: str = "Search by name..."
     icon: Icon = IconSearch()
 
     def _to_tag(self):
@@ -49,7 +50,7 @@ class Input(Partial):
                 "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
                 " hover:border-gray-400 focus:outline-none appearance-none mt-1"
             ),
-            placeholder="Search by name...",
+            placeholder=self.placeholder,
         )
         tag.add(input_)
         tag.add(self.icon.to_tag())
@@ -57,12 +58,12 @@ class Input(Partial):
 
 
 class Box(Partial):
-    contents: List[Any]
+    contents: List[Partial]
 
     def _to_tag(self):
         tag = div()
         for item in self.contents:
-            tag.add(item)
+            tag.add(item.to_tag())
         return tag
 
 
@@ -75,14 +76,14 @@ class TableAction(Partial):
 
 
 class Button(Partial):
-    value: str
+    description: str
     color: str = "blue"
     action: str
     name: str = ""
 
     def _to_tag(self):
         tag = button(
-            self.value,
+            self.description,
             data_controller="swapurl",
             data_action=f"click->swapurl#{self.action}",
             data_swapurl_name_value=self.name,
@@ -91,6 +92,14 @@ class Button(Partial):
                 " max-w-max shadow-sm hover:shadow-lg"
             ),
         )
+        return tag
+
+
+class Text(Partial):
+    value: str
+
+    def _to_tag(self):
+        tag = h1(self.value, _class="relative inline-flex")
         return tag
 
 
