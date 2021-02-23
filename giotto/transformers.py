@@ -1,43 +1,22 @@
-# from typing import List
+from typing import Any, Callable, Dict, List
 
-# from pydantic import BaseModel
-
-
-# class DropdownTransformer(BaseModel):
-#     data: List[str]
-
-#     @classmethod
-#     def from_api(cls, url):
-#         pass
-
-#     def transform(self):
-#         return self.data
+from pydantic import BaseModel
 
 
-# class CustomTransformer(BaseModel):
-#     data: JobAll
+class Transformer(BaseModel):
+    data: Any
 
-#     @classmethod
-#     def from_api(cls, url):
-#         pass
+    @classmethod
+    def from_api(cls, url):
+        pass
 
-#     def transform(self):
-#         names = []
-#         for job in data:
-#             names.append(job.name)
-#         return names
+    @classmethod
+    def from_dict(cls, data: Any):
+        return cls(data=data)
 
-
-# class Dropdown(Partial):
-#     transformer: DropdownTransformer
-
-
-# class Transformer(BaseModel):
-#     def from_api(self):
-#         pass
-
-#     def apply(self):
-#         pass
+    def apply(self, func: Callable):
+        self.data = func(self.data)
+        return self
 
 
 # # 1
