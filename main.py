@@ -1,28 +1,28 @@
-from fastapi import FastAPI
+from typing import Any, List
 
+from dominate import document as doc
+from dominate.tags import body, div, h1, head, link, main, script
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List, Any
-from dominate.tags import head, body, script, link, div, h1, main
-from dominate import document as doc
-from giotto.elements import Select, Button, Input, Box
-from giotto.navigation import TopBar, Sidebar
-from giotto.utils import turbo_frame
 
-from giotto.templates import FrameTemplate, AppLayout
+from giotto.elements import Box, Button, Input, Select, Text
+from giotto.navigation import Sidebar, TopBar
+from giotto.templates import AppLayout, FrameTemplate
+from giotto.utils import turbo_frame
 import mockapis
+from apps_examples.scheduler import SchedulerAppLayout
 
 app = FastAPI()
 
-btn1 = Button(value="Step 1", action="swap", name="start")
-btn2 = Button(value="Step 2", action="swap", name="step2")
-btn_back = Button(value="go back", action="reset")
+btn1 = Button(description="Step 1", action="swap", name="start")
+btn2 = Button(description="Step 2", action="swap", name="step2")
+btn_back = Button(description="go back", action="reset")
 sel_fruit = Select(options=["oranges"])
-explain_frame = Box(
-    contents=[
-        h1("Everything inside the border is a frame. Click the button to see how the frame works")
-    ]
+text = Text(
+    value="Everything inside the border is a frame. Click the button to see how the frame works"
 )
+explain_frame = Box(contents=[text])
 inp = Input()
 inp2 = Input()
 
@@ -38,17 +38,18 @@ class FiltersFrame(FrameTemplate):
         if name == "start":
             el = Select(options=["Apples"]).to_tag()
             tag.add(el)
-            tag.add(
-                h1(
-                    f"""the button was clicked and the name is {name}. 
-                        Note how we can change everything, including
-                        the select on the left.""",
-                    _class="relative inline-flex",
-                )
-            )
+            text = Text(
+                value=f"the button was clicked and the name is {name}."
+                " Note how we can change everything, including"
+                " the select on the left."
+            ).to_tag()
+            tag.add(text)
             return tag.render()
         elif name == "step2":
-            tag.add(h1("You see? Now we changed the frame again - only this text ;)"))
+            text = Text(
+                value="You see? Now we changed the frame again - only this text ;)"
+            ).to_tag()
+            tag.add(text)
             return tag.render()
         else:
             tag = turbo_frame(_id="frametest")
@@ -66,4 +67,5 @@ class TestAppLayout(AppLayout):
 
 app.add_api_route(**TestAppLayout().to_register())
 app.add_api_route(**FiltersFrame().to_register())
+app.add_api_route(**SchedulerAppLayout().to_register())
 app.mount("/assets/dist", StaticFiles(directory="assets/dist"), name="assets")
