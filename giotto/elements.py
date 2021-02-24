@@ -127,7 +127,7 @@ class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
-    actions: List[Button] = []
+    # actions: List[Button] = []
 
     def _to_tag(self):
         tag = div(_class="container overflow-x-auto mx-auto mt-2")
@@ -138,9 +138,9 @@ class Table(Partial):
             # HEADER
             _thr = tr(_class="bg-dark text-white border border-gray-200")
             if counter == 0:
-                if self.actions:
-                    _th = th("Actions", _class="py-2 p-3", colspan=len(self.actions))
-                    _thr.add(_th)
+                # if self.actions:
+                #     _th = th("Actions", _class="py-2 p-3", colspan=len(self.actions))
+                #     _thr.add(_th)
                 for key, value in row.items():
                     _th = th(key, _class="py-2 p-3")
                     _thr.add(_th)
@@ -148,12 +148,16 @@ class Table(Partial):
             # BODY
             bg = "" if counter % 2 == 0 else "bg-gray-50"
             _tr = tr(_class=f"{bg} hover:bg-gray-200 border border-gray-200")
-            for action in self.actions:
-                _td = td(_class="text-center p-2 border-0")
-                _td.add(action.to_tag())
-                _tr.add(_td)
+            # for action in self.actions:
+            #     _td = td(_class="text-center p-2 border-0")
+            #     _td.add(action.to_tag())
+            #     _tr.add(_td)
             for key, value in row.items():
-                _td = td(str(value), _class="text-center p-2 border-0")
+                if isinstance(value, Partial):
+                    _td = td(_class="text-center p-2 border-0")
+                    _td.add(value.to_tag())
+                else:
+                    _td = td(str(value), _class="text-center p-2 border-0")
                 _tr.add(_td)
             _tbody.add(_tr)
         _table.add(_thead)

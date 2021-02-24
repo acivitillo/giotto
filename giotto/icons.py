@@ -71,16 +71,38 @@ class IconSearch(Icon):
         return tag
 
 
+class IconEye(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-8 h-8 m-1 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="none",
+            viewBox="0 0 20 20",
+            stroke="currentColor",
+        )
+        _path = path(fill="white", d="M10 12a2 2 0 100-4 2 2 0 000 4z",)
+        tag.add(_path)
+        _path = path(
+            fill_rule="evenodd",
+            clip_rule="evenodd",
+            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z",
+        )
+        tag.add(_path)
+        return tag
+
+
 class IconDetails(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="w-4 h-5 m-3 pointer-events-none",
+            _class="w-6 h-6 m-2 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             fill="none",
             viewBox="0 0 24 24",
-            stroke="currentColor",
+            stroke="white",
         )
-        _path = path(strokeLinecap="round", strokeLinejoin="round", d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",)
+        _path = path(
+            stroke_linecap="round", stroke_linejoin="round", fill="white", d="M4 6h16M4 10h16M4 14h16M4 18h16",
+        )
         tag.add(_path)
         return tag
 
