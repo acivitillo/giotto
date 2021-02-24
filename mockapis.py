@@ -160,11 +160,9 @@ job_4_runs = {
 
 jobruns = {
     "data": [
-        {
-            "print_hello": job_1_runs["data"],
-            "salary_data_validation": job_2_runs["data"],
-            "test_job": job_3_runs["data"],
-            "test_job_2": job_4_runs["data"],
-        }
+        *job_1_runs["data"],
+        *job_2_runs["data"],
+        *job_3_runs["data"],
+        *job_4_runs["data"],
     ]
 }
