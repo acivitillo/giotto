@@ -106,8 +106,7 @@ class Button(Partial):
         size = "px-8 py-2"
         if self.is_flex:
             size = ""
-        tag = div()
-        _button = button(
+        tag = button(
             self.description,
             data_controller="swapurl",
             data_action=f"click->swapurl#{self.action}",
@@ -118,8 +117,7 @@ class Button(Partial):
             ),
         )
         if self.icon:
-            _button.add(self.icon.to_tag())
-        tag.add(_button)
+            tag.add(self.icon.to_tag())
         return tag
 
 
@@ -201,7 +199,9 @@ class TabContainer(Partial):
             if clicked_id == index:
                 _ul.add(li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg"))
             else:
-                _ul.add(li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200"))
+                _ul.add(
+                    li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200")
+                )
         _style.add(_ul)
         _tag.add(_style)
         ###  WE NEED TO APPEND TURBO FRAME

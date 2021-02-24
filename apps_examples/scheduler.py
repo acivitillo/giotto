@@ -11,9 +11,9 @@ from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay
 import mockapis
 
 inp = Input(placeholder="Search Job...")
-run_btn = Button(description="", color="green", icon=IconPlay(), action="swap", is_flex=True)
-stop_btn = Button(description="", color="red", icon=IconStop(), action="swap", is_flex=True)
-description_btn = Button(description="", color="blue", icon=IconDetails(), action="swap", is_flex=True)
+description_btn = Button(
+    description="", color="blue", icon=IconDetails(), action="swap", is_flex=True
+)
 
 
 def transform_data_jobs(data: Dict):
@@ -31,7 +31,12 @@ def transform_data_jobs(data: Dict):
     for row in data:
         new_row = dict()
         new_row["action"] = Button(
-            description="", color="blue", name=row["name"] + "_details", icon=IconDetails(), action="swap", is_flex=True
+            description="",
+            color="blue",
+            name=row["name"] + "_details",
+            icon=IconDetails(),
+            action="swap",
+            is_flex=True,
         )
         for key, value in row.items():
             new_key = key.replace("_", " ").title()
@@ -48,12 +53,11 @@ def transform_data_jobruns(data: Dict):
 
 
 jobs_data = Transformer.from_dict(mockapis.jobs).apply(transform_data_jobs).data
-jobruns_data = Transformer.from_dict(mockapis.job_1_runs).apply(transform_data_jobruns).data
+jobruns_data = Transformer.from_dict(mockapis.jobruns).apply(transform_data_jobruns).data
 
-
-# table = Table(data=data, actions=[run_btn, description_btn])
 table_jobs = Table(data=jobs_data)
 table_jobruns2 = Table(data=jobruns_data)
+
 # Frame
 class JobrunsFrame(FrameTemplate):
     route = "/someurl"
@@ -64,17 +68,25 @@ class JobrunsFrame(FrameTemplate):
             route = self.route
         tag = turbo_frame(_id="frametest", src=route)
         if name[-8:] == "_details":
-            table_jobruns = Table(date=jobruns_data).to_tag()
+            run_btn = Button(
+                description="", color="green", icon=IconPlay(), action="run", is_flex=True
+            )
+            stop_btn = Button(
+                description="", color="red", icon=IconStop(), action="stop", is_flex=True
+            )
+            box = Box(contents=[run_btn, stop_btn]).to_tag()
+            table_jobruns = Table(data=jobruns_data["name"]).to_tag()
+            tag.add(box)
             tag.add(table_jobruns)
-            return tag.render()
+        return tag.render()
 
 
 # Page
-content = Box(contents=[inp, table_jobs, table_jobruns2, JobrunsFrame()])
+content = Box(contents=[inp, table_jobs])
 
 
 class SchedulerAppLayout(AppLayout):
     route = "/scheduler"
     sidebar = Sidebar(items=mockapis.sidebar_items)
-    content: List[BaseModel] = [content]
+    content: List[BaseModel] = [content, JobrunsFrame()]
     site_name = "Scheduler App"

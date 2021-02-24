@@ -11,7 +11,7 @@ from giotto.navigation import Sidebar, TopBar
 from giotto.templates import AppLayout, FrameTemplate
 from giotto.utils import turbo_frame
 import mockapis
-from apps_examples.scheduler import SchedulerAppLayout
+from apps_examples.scheduler import SchedulerAppLayout, JobrunsFrame
 
 app = FastAPI()
 
@@ -66,6 +66,7 @@ class TestAppLayout(AppLayout):
 
 
 app.add_api_route(**TestAppLayout().to_register())
-app.add_api_route(**FiltersFrame().to_register())
+# app.add_api_route(**FiltersFrame().to_register())
 app.add_api_route(**SchedulerAppLayout().to_register())
+app.add_api_route(**JobrunsFrame().to_register())
 app.mount("/assets/dist", StaticFiles(directory="assets/dist"), name="assets")
