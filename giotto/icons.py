@@ -1,7 +1,7 @@
 from typing import List
 
 
-from dominate.tags import _input, a, div, option, select, button
+from dominate.tags import _input, a, div, option, select, button, img
 
 from .base import Partial
 from .utils import svg, path
@@ -13,29 +13,15 @@ class Icon(Partial):
 
 class IconHMenu(Icon):
     def _to_tag(self):
-        tag = svg(
-            xmlns="http://www.w3.org/2000/svg",
-            fill="none",
-            viewBox="0 0 24 28",
-            stroke="currentColor",
-        )
-        _path = path(
-            color="white",
-            strokeLinecap="round",
-            strokeLinejoin="round",
-            d="M4 6h16M4 12h16M4 18h16",
-        )
+        tag = svg(xmlns="http://www.w3.org/2000/svg", fill="none", viewBox="0 0 24 28", stroke="currentColor",)
+        _path = path(color="white", strokeLinecap="round", strokeLinejoin="round", d="M4 6h16M4 12h16M4 18h16",)
         tag.add(_path)
         return tag
 
 
 class IconDownarrow(Icon):
     def _to_tag(self):
-        tag = svg(
-            _class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none",
-            xmlns="http://www.w3.org/2000/svg",
-            viewBox="0 0 412 232",
-        )
+        tag = svg(_class="w-2 h-2 m-4 pointer-events-none", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 412 232",)
         _path = path(
             d=(
                 "M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9"
@@ -53,9 +39,7 @@ class IconDownarrow(Icon):
 
 class IconFiles(Icon):
     def _to_tag(self):
-        tag = svg(
-            _class="h-5 w-5", viewBox="0 0 24 24", fill="none", xmlns="http://www.w3.org/2000/svg"
-        )
+        tag = svg(_class="h-5 w-5", viewBox="0 0 24 24", fill="none", xmlns="http://www.w3.org/2000/svg")
         _path = path(
             d=(
                 "M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.10"
@@ -76,7 +60,35 @@ class IconFiles(Icon):
 class IconSearch(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="w-4 h-5 absolute top-0 right-0 m-3 pointer-events-none",
+            _class="w-4 h-5 m-3 absolute top-0 right-0 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="none",
+            viewBox="0 0 24 24",
+            stroke="currentColor",
+        )
+        _path = path(strokeLinecap="round", strokeLinejoin="round", d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",)
+        tag.add(_path)
+        return tag
+
+
+class IconDetails(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-4 h-5 m-3 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="none",
+            viewBox="0 0 24 24",
+            stroke="currentColor",
+        )
+        _path = path(strokeLinecap="round", strokeLinejoin="round", d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",)
+        tag.add(_path)
+        return tag
+
+
+class IconPlay(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-10 h-10 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             fill="none",
             viewBox="0 0 24 24",
@@ -85,7 +97,27 @@ class IconSearch(Icon):
         _path = path(
             strokeLinecap="round",
             strokeLinejoin="round",
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
+            fill="white",
+            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z",
+        )
+        tag.add(_path)
+        return tag
+
+
+class IconStop(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-10 h-10 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="none",
+            viewBox="0 0 24 24",
+            stroke="currentColor",
+        )
+        _path = path(
+            strokeLinecap="round",
+            strokeLinejoin="round",
+            fill="white",
+            d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z",
         )
         tag.add(_path)
         return tag

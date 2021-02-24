@@ -6,13 +6,12 @@ from giotto.elements import Box, Input, Table, Text, Button
 from giotto.navigation import Sidebar
 from giotto.templates import AppLayout
 from giotto.transformers import Transformer
+from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay
 import mockapis
 
-
-title = Text(value="Scheduler App")
 inp = Input(placeholder="Search Job...")
-run_btn = Button(description="Run", action="swap")
-stop_btn = Button(description="Stop", action="swap")
+run_btn = Button(description="", color="green", icon=IconPlay(), action="swap", is_flex=True)
+stop_btn = Button(description="", color="red", icon=IconStop(), action="swap", is_flex=True)
 
 
 def transform_data(data: Dict):
@@ -29,6 +28,7 @@ def transform_data(data: Dict):
     new_data = []
     for row in data:
         new_row = dict()
+        # new_row['action'] = Button(description)
         for key, value in row.items():
             new_key = key.replace("_", " ").title()
             new_row[new_key] = value
@@ -41,8 +41,7 @@ def transform_data(data: Dict):
 data = Transformer.from_dict(mockapis.jobs).apply(transform_data).data
 
 table = Table(data=data, actions=[run_btn, stop_btn])
-content = Box(contents=[title, inp, table])
-
+content = Box(contents=[inp, table])
 
 # Page
 class SchedulerAppLayout(AppLayout):

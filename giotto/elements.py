@@ -18,6 +18,7 @@ from dominate.tags import (
     th,
     td,
     tbody,
+    img,
 )
 from dominate.util import raw
 
@@ -94,22 +95,31 @@ class TableAction(Partial):
 
 
 class Button(Partial):
-    description: str
+    description: str = ""
+    icon: Optional[Icon]
     color: str = "blue"
     action: str
     name: str = ""
+    is_flex: bool = False
 
     def _to_tag(self):
-        tag = button(
+        size = "px-8 py-2"
+        if self.is_flex:
+            size = ""
+        tag = div()
+        _button = button(
             self.description,
             data_controller="swapurl",
             data_action=f"click->swapurl#{self.action}",
             data_swapurl_name_value=self.name,
             _class=(
-                f"uppercase mt-1 px-8 py-2 bg-{self.color}-500 text-blue-50"
+                f"uppercase mt-1 {size} rounded-md bg-{self.color}-600 text-blue-50"
                 " max-w-max shadow-sm hover:shadow-lg"
             ),
         )
+        if self.icon:
+            _button.add(self.icon.to_tag())
+        tag.add(_button)
         return tag
 
 
@@ -137,7 +147,7 @@ class Table(Partial):
                 _thead.add(_thr)
             # BODY
             bg = "" if counter % 2 == 0 else "bg-gray-50"
-            _tr = tr(_class=f"{bg} hover:bg-cgrey_200 border border-gray-200")
+            _tr = tr(_class=f"{bg} hover:bg-gray-200 border border-gray-200")
             for action in self.actions:
                 _td = td(_class="text-center p-2 border-0")
                 _td.add(action.to_tag())
@@ -187,9 +197,7 @@ class TabContainer(Partial):
             if clicked_id == index:
                 _ul.add(li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg"))
             else:
-                _ul.add(
-                    li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200")
-                )
+                _ul.add(li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200"))
         _style.add(_ul)
         _tag.add(_style)
         ###  WE NEED TO APPEND TURBO FRAME
