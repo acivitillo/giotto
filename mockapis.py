@@ -32,7 +32,7 @@ job_1 = {
     "function": "891970d0-9457-4db3-8351-36e224f90f35",
     "upstream": {},
     "description": None,
-    "downstream": {"print_hello": "success"},
+    "downstream": {"salary_data_validation": "success"},
 }
 
 job_2 = {
