@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from giotto.elements import Box, Button, Input, Select, Text
+from giotto.elements import Box, Button, Input, Select, Text, Column
 from giotto.navigation import Sidebar, TopBar
 from giotto.templates import AppLayout, FrameTemplate
 from giotto.utils import turbo_frame
@@ -15,9 +15,9 @@ from apps_examples.scheduler import SchedulerAppLayout, JobrunsFrame
 
 app = FastAPI()
 
-btn1 = Button(description="Step 1", action="swap", name="start")
-btn2 = Button(description="Step 2", action="swap", name="step2")
-btn_back = Button(description="go back", action="reset")
+btn1 = Button(description="Step 1", action="swap", name="start", target_frame="frametest")
+btn2 = Button(description="Step 2", action="swap", name="step2", target_frame="frametest")
+btn_back = Button(description="go back", action="reset", target_frame="frametest")
 sel_fruit = Select(options=["oranges"])
 text = Text(
     value="Everything inside the border is a frame. Click the button to see how the frame works"
@@ -28,13 +28,14 @@ inp2 = Input()
 
 # Frame
 class FiltersFrame(FrameTemplate):
-    route = "/someurl"
+    route = "/frameurl"
     content: List[BaseModel] = [sel_fruit, inp, inp2, explain_frame]
+    name = "frametest"
 
     def to_html(self, name: str = "", route: str = ""):
         if route == "":
             route = self.route
-        tag = turbo_frame(_id="frametest", src=route)
+        tag = turbo_frame(_id=self.name, src=route)
         if name == "start":
             el = Select(options=["Apples"]).to_tag()
             tag.add(el)
@@ -52,7 +53,7 @@ class FiltersFrame(FrameTemplate):
             tag.add(text)
             return tag.render()
         else:
-            tag = turbo_frame(_id="frametest")
+            tag = turbo_frame(_id=self.name)
             for item in self.content:
                 tag.add(item.to_tag())
             return tag.render()
