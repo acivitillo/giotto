@@ -95,6 +95,7 @@ class AppLayout(Template):
 
 class FrameTemplate(Template):
     content: List[BaseModel]
+    name: str = "schedulerframe"
 
     @property
     def head(self):
@@ -105,7 +106,5 @@ class FrameTemplate(Template):
         return None
 
     def _to_tag(self):  # to improve
-        tag = turbo_frame(
-            _id="frametest", src=self.route, _class="border-4 border-color-grey-200 p-2"
-        )
+        tag = turbo_frame(_id=self.name, src=self.route, _class="p-2")
         return tag

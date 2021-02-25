@@ -2,17 +2,15 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-    static values = { name: String }
+    static values = { name: String, frame: String }
 
-    connect() {
-        console.log("Hello, Stimulus!", this.element)
-    };
     swap() {
-        var frame = document.getElementById("frametest")
-        frame.setAttribute("src", `/someurl?name=${this.nameValue}`);
+        console.log("here", this.frameValue)
+        var frame = document.getElementById(this.frameValue)
+        frame.setAttribute("src", `/frameurl?name=${this.nameValue}`);
     };
     reset() {
-        var frame = document.getElementById("frametest")
-        frame.setAttribute("src", "/someurl");
+        var frame = document.getElementById(this.frameValue)
+        frame.setAttribute("src", "/frameurl");
     };
 }
