@@ -7,7 +7,7 @@ from giotto.navigation import Sidebar
 from giotto.templates import AppLayout, FrameTemplate
 from giotto.transformers import Transformer
 from giotto.utils import turbo_frame
-from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay, IconEye
+from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay, IconBin
 import mockapis
 
 
@@ -75,10 +75,29 @@ class JobrunsFrame(FrameTemplate):
         if name[-8:] == "_details":
             job_name = name[:-8]
             title = Text(value=job_name, size="4xl", weight="bold")
-            run_btn = Button(description="Run", color="green", icon=IconPlay(), action="run")
-            stop_btn = Button(description="Stop", color="red", icon=IconStop(), action="stop")
+            run_btn = Button(
+                description="Run",
+                color="green",
+                icon=IconPlay(),
+                action="swap",
+                name=job_name + "_run",
+            )
+            stop_btn = Button(
+                description="Stop",
+                color="red",
+                icon=IconStop(),
+                action="swap",
+                name=job_name + "_stop",
+            )
+            unregister_btn = Button(
+                description="Unregister",
+                color="purple",
+                icon=IconBin(),
+                action="swap",
+                name=job_name + "_unregister",
+            )
             # buttons = Row(contents=[run_btn, stop_btn])
-            box = Box(contents=[title, run_btn, stop_btn]).to_tag()
+            box = Box(contents=[title, run_btn, stop_btn, unregister_btn]).to_tag()
             table_jobruns = Table(data=mockapis.jobruns_raw[job_name]["data"]).to_tag()
             tag.add(box)
             tag.add(table_jobruns)
