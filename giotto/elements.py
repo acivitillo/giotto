@@ -1,30 +1,32 @@
 from __future__ import annotations
-from typing import List, Any, Optional, Dict
-
+from typing import Any, Dict, List, Optional
 
 from dominate.tags import (
     _input,
     a,
+    button,
     div,
     h1,
+    img,
+    li,
     option,
     select,
-    button,
-    ul,
-    li,
     table,
-    tr,
-    thead,
-    th,
-    td,
     tbody,
-    img,
+    td,
+    th,
+    thead,
+    tr,
+    ul,
+    p,
+    span,
 )
 from dominate.util import raw
+from markdown import markdown
 
 from .base import Partial
-from .utils import svg, path, turbo_frame
 from .icons import Icon, IconSearch
+from .utils import path, svg, turbo_frame
 
 
 class Select(Partial):
@@ -80,7 +82,27 @@ class Box(Partial):
     contents: List[Partial]
 
     def _to_tag(self):
-        tag = div()
+        tag = div(_class="container")
+        for item in self.contents:
+            tag.add(item.to_tag())
+        return tag
+
+
+class Row(Partial):
+    contents: List[Partial]
+
+    def _to_tag(self):
+        tag = div(_class="flex flex-row")
+        for item in self.contents:
+            tag.add(item.to_tag())
+        return tag
+
+
+class Column(Partial):
+    contents: List[Partial]
+
+    def _to_tag(self):
+        tag = div(_class="flex flex-col")
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
@@ -101,23 +123,28 @@ class Button(Partial):
     action: str
     name: str = ""
     is_flex: bool = False
+    target_frame: str = ""
 
     def _to_tag(self):
-        size = "px-8 py-2"
+        size = "px-5 h-12 "
         if self.is_flex:
             size = ""
         tag = button(
-            self.description,
             data_controller="swapurl",
             data_action=f"click->swapurl#{self.action}",
             data_swapurl_name_value=self.name,
+            data_swapurl_frame_value=self.target_frame,
             _class=(
-                f"uppercase mt-1 {size} rounded-md bg-{self.color}-600 text-blue-50"
-                " max-w-max shadow-sm hover:shadow-lg"
+                f"uppercase mt-1 {size}rounded-lg bg-{self.color}-400"
+                f" items-center font-medium text-black max-w-max shadow-sm cursor-pointer"
+                f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
+                f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
             ),
         )
         if self.icon:
             tag.add(self.icon.to_tag())
+        # _desc = p(self.description, _class="font-semibold")
+        tag.add(span(self.description))
         return tag
 
 
@@ -125,7 +152,6 @@ class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
-    # actions: List[Button] = []
 
     def _to_tag(self):
         tag = div(_class="container overflow-x-auto mx-auto mt-2")
@@ -136,20 +162,13 @@ class Table(Partial):
             # HEADER
             _thr = tr(_class="bg-dark text-white border border-gray-200")
             if counter == 0:
-                # if self.actions:
-                #     _th = th("Actions", _class="py-2 p-3", colspan=len(self.actions))
-                #     _thr.add(_th)
                 for key, value in row.items():
-                    _th = th(key, _class="py-2 p-3")
+                    _th = th(key, _class="whitespace-nowrap py-2 p-3")
                     _thr.add(_th)
                 _thead.add(_thr)
             # BODY
             bg = "" if counter % 2 == 0 else "bg-gray-50"
             _tr = tr(_class=f"{bg} hover:bg-gray-200 border border-gray-200")
-            # for action in self.actions:
-            #     _td = td(_class="text-center p-2 border-0")
-            #     _td.add(action.to_tag())
-            #     _tr.add(_td)
             for key, value in row.items():
                 if isinstance(value, Partial):
                     _td = td(_class="text-center p-2 border-0")
@@ -166,9 +185,14 @@ class Table(Partial):
 
 class Text(Partial):
     value: str
+    size: str = "base"
+    weight: str = "normal"
 
     def _to_tag(self):
-        tag = h1(self.value, _class="relative inline-flex")
+        tag = div(
+            raw(markdown(self.value)),
+            _class=f"text-{self.size} font-{self.weight} m-1",
+        )
         return tag
 
 
