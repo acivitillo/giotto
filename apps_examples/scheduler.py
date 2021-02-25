@@ -2,18 +2,13 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel
 
-from giotto.elements import Box, Input, Table, Text, Button
+from giotto.elements import Box, Input, Table, Text, Button, Row
 from giotto.navigation import Sidebar
 from giotto.templates import AppLayout, FrameTemplate
 from giotto.transformers import Transformer
 from giotto.utils import turbo_frame
-from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay
+from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay, IconEye
 import mockapis
-
-inp = Input(placeholder="Search Job...")
-description_btn = Button(
-    description="", color="blue", icon=IconDetails(), action="swap", is_flex=True
-)
 
 
 def transform_data_jobs(data: Dict):
@@ -30,13 +25,14 @@ def transform_data_jobs(data: Dict):
     new_data = []
     for row in data:
         new_row = dict()
-        new_row["action"] = Button(
+        new_row["Action"] = Button(
             description="",
             color="blue",
             name=row["name"] + "_details",
             icon=IconDetails(),
             action="swap",
             is_flex=True,
+            target_frame="schedulerframe",
         )
         for key, value in row.items():
             new_key = key.replace("_", " ").title()
@@ -52,30 +48,38 @@ def transform_data_jobruns(data: Dict):
     return data
 
 
-jobs_data = Transformer.from_dict(mockapis.jobs).apply(transform_data_jobs).data
+jobs_data = transform_data_jobs(mockapis.jobs)
 jobruns_data = Transformer.from_dict(mockapis.jobruns).apply(transform_data_jobruns).data
 
+
+inp = Input(placeholder="Search Job...")
 table_jobs = Table(data=jobs_data)
 table_jobruns2 = Table(data=jobruns_data)
-
+# class
+# route = "/some/api"
+# job_name = ...
+# get /some/api?job_name=...
+# transform jobs into [{}]
+# from_dict
+# Table.from_function(transform_data_jobruns, "/some/api", params)
 # Frame
 class JobrunsFrame(FrameTemplate):
-    route = "/someurl"
+    route = "/frameurl"
     content: List[BaseModel] = []
+    name = "schedulerframe"
 
     def to_html(self, name: str = "", route: str = ""):
         if route == "":
             route = self.route
-        tag = turbo_frame(_id="frametest", src=route)
+        tag = turbo_frame(_id="schedulerframe", src=route)
         if name[-8:] == "_details":
-            run_btn = Button(
-                description="", color="green", icon=IconPlay(), action="run", is_flex=True
-            )
-            stop_btn = Button(
-                description="", color="red", icon=IconStop(), action="stop", is_flex=True
-            )
-            box = Box(contents=[run_btn, stop_btn]).to_tag()
-            table_jobruns = Table(data=jobruns_data["name"]).to_tag()
+            job_name = name[:-8]
+            title = Text(value=job_name, size="4xl", weight="bold")
+            run_btn = Button(description="Run", color="green", icon=IconPlay(), action="run")
+            stop_btn = Button(description="Stop", color="red", icon=IconStop(), action="stop")
+            # buttons = Row(contents=[run_btn, stop_btn])
+            box = Box(contents=[title, run_btn, stop_btn]).to_tag()
+            table_jobruns = Table(data=mockapis.jobruns_raw[job_name]["data"]).to_tag()
             tag.add(box)
             tag.add(table_jobruns)
         return tag.render()
