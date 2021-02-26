@@ -5,13 +5,13 @@ export default class extends Controller {
 
     hide() {
         this.rowTargets.forEach(element => {
-            element.classList.add("invisible")
+            element.classList.add("hidden")
         });
     };
 
     unhide() {
         this.rowTargets.forEach(element => {
-            element.classList.remove("invisible")
+            element.classList.remove("hidden")
         });
     };
 
