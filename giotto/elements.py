@@ -154,7 +154,7 @@ class Table(Partial):
     description: Optional[str]
 
     def _to_tag(self):
-        tag = div(_class="container overflow-x-auto mx-auto mt-2")
+        tag = div(_class="container overflow-x-auto mx-auto mt-2", data_controller="table")
         _table = table()
         _thead = thead(_class="bg-primary border-l-2 border-r-2 border-gray-200 text-white")
         _tbody = tbody()
@@ -168,7 +168,10 @@ class Table(Partial):
                 _thead.add(_thr)
             # BODY
             bg = "" if counter % 2 == 0 else "bg-gray-50"
-            _tr = tr(_class=f"{bg} hover:bg-gray-200 border border-gray-200")
+            _tr = tr(
+                _class=f"{bg} hover:bg-gray-200 border border-gray-200",
+                data_table_target="row",
+            )
             for key, value in row.items():
                 if isinstance(value, Partial):
                     _td = td(_class="text-center p-2 border-0")
@@ -180,7 +183,14 @@ class Table(Partial):
         _table.add(_thead)
         _table.add(_tbody)
         tag.add(_table)
+        self._add_pagination(tag)
         return tag
+
+    def _add_pagination(self, tag):
+        hide_button = button("Hide", data_action="click->table#hide")
+        unhide_button = button("Unhide", data_action="click->table#unhide")
+        _div = div(hide_button, unhide_button, _class="border border-gray-300")
+        tag.add(_div)
 
 
 class Text(Partial):
