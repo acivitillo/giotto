@@ -163,3 +163,29 @@ class IconBin(Icon):
         )
         tag.add(_path)
         return tag
+
+
+class IconPrev(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-6 h-6 m-2 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="currentColor",
+            viewBox="0 0 24 24",
+        )
+        _path = path(stroke_linecap="round", stroke_linejoin="round", d=("M15 19l-7-7 7-7"),)
+        tag.add(_path)
+        return tag
+
+
+class IconNext(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-6 h-6 m-2 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="currentColor",
+            viewBox="0 0 24 24",
+        )
+        _path = path(stroke_linecap="round", stroke_linejoin="round", d=("M9 5l7 7-7 7"),)
+        tag.add(_path)
+        return tag
