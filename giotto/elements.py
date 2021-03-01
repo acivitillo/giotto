@@ -20,12 +20,13 @@ from dominate.tags import (
     ul,
     p,
     span,
+    nav,
 )
 from dominate.util import raw
 from markdown import markdown
 
 from .base import Partial
-from .icons import Icon, IconSearch
+from .icons import Icon, IconSearch, IconFirstPage, IconPreviousPage, IconNextPage, IconLastPage
 from .utils import path, svg, turbo_frame
 
 
@@ -152,24 +153,40 @@ class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
+    max_rows: int = 2
 
     def _to_tag(self):
-        tag = div(_class="container overflow-x-auto mx-auto mt-2")
-        _table = table()
-        _thead = thead(_class="bg-primary border-l-2 border-r-2 border-gray-200 text-white")
+        tag = div(
+            _class="container overflow-x-auto grid mt-2 shadow sm:rounded-lg",
+            data_controller="table",
+            data_table_max_page_rows_value=self.max_rows,
+        )
+        _thead = self._get_thead()
+        _tbody = self._get_tbody()
+        _table = table(_thead, _tbody)
+        pagination = self._get_pagination()
+        tag.add(_table, pagination)
+        return tag
+
+    def _get_thead(self):
+        _thead = thead(_class="bg-primary text-white")
+        if self.data:
+            _thr = tr(_class="bg-dark text-white")
+            for key in self.data[0].keys():
+                _th = th(key, _class="whitespace-nowrap py-2 p-3")
+                _thr.add(_th)
+            _thead.add(_thr)
+        return _thead
+
+    def _get_tbody(self):
         _tbody = tbody()
         for counter, row in enumerate(self.data):
-            # HEADER
-            _thr = tr(_class="bg-dark text-white border border-gray-200")
-            if counter == 0:
-                for key, value in row.items():
-                    _th = th(key, _class="whitespace-nowrap py-2 p-3")
-                    _thr.add(_th)
-                _thead.add(_thr)
-            # BODY
             bg = "" if counter % 2 == 0 else "bg-gray-50"
-            _tr = tr(_class=f"{bg} hover:bg-gray-200 border border-gray-200")
-            for key, value in row.items():
+            _tr = tr(
+                _class=f"{bg} hover:bg-gray-200 border-b border-gray-200",
+                data_table_target="row",
+            )
+            for value in row.values():
                 if isinstance(value, Partial):
                     _td = td(_class="text-center p-2 border-0")
                     _td.add(value.to_tag())
@@ -177,21 +194,57 @@ class Table(Partial):
                     _td = td(str(value), _class="text-center p-2 border-0")
                 _tr.add(_td)
             _tbody.add(_tr)
-        _table.add(_thead)
-        _table.add(_tbody)
-        tag.add(_table)
-        return tag
+        return _tbody
+
+    def _get_pagination(self):
+        desc = Text(value=f"{len(self.data)} results", color="gray-500").to_tag()
+        button_class = (
+            "relative inline-flex items-center px-2 py-2 border border-gray-300"
+            " bg-white text-gray-500 hover:bg-gray-50 focus:outline-none"
+        )
+        first_button = button(
+            IconFirstPage().to_tag(),
+            data_action="click->table#firstPage",
+            _class=button_class + " rounded-l-md",
+        )
+        prev_button = button(
+            IconPreviousPage().to_tag(),
+            data_action="click->table#previousPage",
+            _class=button_class,
+        )
+        next_button = button(
+            IconNextPage().to_tag(), data_action="click->table#nextPage", _class=button_class
+        )
+        last_button = button(
+            IconLastPage().to_tag(),
+            data_action="click->table#lastPage",
+            _class=button_class + " rounded-r-md",
+        )
+        buttons = nav(
+            first_button,
+            prev_button,
+            next_button,
+            last_button,
+            _class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
+        )
+        _div = div(
+            desc,
+            buttons,
+            _class="flex justify-between items-center sm:px-2 sm:py-2",
+        )
+        return _div
 
 
 class Text(Partial):
     value: str
     size: str = "base"
     weight: str = "normal"
+    color: str = "black"
 
     def _to_tag(self):
         tag = div(
             raw(markdown(self.value)),
-            _class=f"text-{self.size} font-{self.weight} m-1",
+            _class=f"text-{self.size} font-{self.weight} text-{self.color} m-1",
         )
         return tag
 
