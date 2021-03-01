@@ -152,27 +152,40 @@ class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
+    max_rows: int = 2
 
     def _to_tag(self):
-        tag = div(_class="container overflow-x-auto mx-auto mt-2", data_controller="table")
-        _table = table()
+        tag = div(
+            _class="container overflow-x-auto mx-auto mt-2 shadow sm:rounded-lg",
+            data_controller="table",
+            data_table_entries_value=self.max_rows,
+        )
+        _thead = self._get_thead()
+        _tbody = self._get_tbody()
+        _table = table(_thead, _tbody)
+        pagination = self._get_pagination()
+        tag.add(_table, pagination)
+        return tag
+
+    def _get_thead(self):
         _thead = thead(_class="bg-primary border-l-2 border-r-2 border-gray-200 text-white")
+        if self.data:
+            _thr = tr(_class="bg-dark text-white border border-gray-200")
+            for key in self.data[0].keys():
+                _th = th(key, _class="whitespace-nowrap py-2 p-3")
+                _thr.add(_th)
+            _thead.add(_thr)
+        return _thead
+
+    def _get_tbody(self):
         _tbody = tbody()
         for counter, row in enumerate(self.data):
-            # HEADER
-            _thr = tr(_class="bg-dark text-white border border-gray-200")
-            if counter == 0:
-                for key, value in row.items():
-                    _th = th(key, _class="whitespace-nowrap py-2 p-3")
-                    _thr.add(_th)
-                _thead.add(_thr)
-            # BODY
             bg = "" if counter % 2 == 0 else "bg-gray-50"
             _tr = tr(
                 _class=f"{bg} hover:bg-gray-200 border border-gray-200",
                 data_table_target="row",
             )
-            for key, value in row.items():
+            for value in row.values():
                 if isinstance(value, Partial):
                     _td = td(_class="text-center p-2 border-0")
                     _td.add(value.to_tag())
@@ -180,17 +193,17 @@ class Table(Partial):
                     _td = td(str(value), _class="text-center p-2 border-0")
                 _tr.add(_td)
             _tbody.add(_tr)
-        _table.add(_thead)
-        _table.add(_tbody)
-        tag.add(_table)
-        self._add_pagination(tag)
-        return tag
+        return _tbody
 
-    def _add_pagination(self, tag):
+    def _get_pagination(self):
+        desc = Text(value=f"{len(self.data)} results").to_tag()
         hide_button = button("Hide", data_action="click->table#hide")
         unhide_button = button("Unhide", data_action="click->table#unhide")
-        _div = div(hide_button, unhide_button, _class="border border-gray-300")
-        tag.add(_div)
+        prev_button = button("Prev", data_action="click->table#prev")
+        next_button = button("Next", data_action="click->table#next")
+        buttons = div(hide_button, unhide_button, prev_button, next_button)
+        _div = div(desc, buttons, _class="flex justify-between border-t border-gray-300 sm:px-6")
+        return _div
 
 
 class Text(Partial):
