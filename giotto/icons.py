@@ -165,27 +165,79 @@ class IconBin(Icon):
         return tag
 
 
-class IconPrev(Icon):
+class IconFirstPage(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="w-6 h-6 m-2 pointer-events-none",
+            _class="w-6 h-6 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             fill="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(stroke_linecap="round", stroke_linejoin="round", d=("M15 19l-7-7 7-7"),)
+        _path = path(
+            d=(
+                "M17.7 15.89L13.82 12l3.89-3.89c.39-.39.39-1.02 0-1.41-.39-.39-"
+                "1.02-.39-1.41 0l-4.59 4.59c-.39.39-.39 1.02 0 1.41l4.59 4.59c."
+                "39.39 1.02.39 1.41 0 .38-.38.38-1.02-.01-1.4zM7 6c.55 0 1 .45 "
+                "1 1v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1z"
+            ),
+        )
         tag.add(_path)
         return tag
 
 
-class IconNext(Icon):
+class IconPreviousPage(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="w-6 h-6 m-2 pointer-events-none",
+            _class="w-6 h-6 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             fill="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(stroke_linecap="round", stroke_linejoin="round", d=("M9 5l7 7-7 7"),)
+        _path = path(
+            d=(
+                "M14.71 6.71c-.39-.39-1.02-.39-1.41 0L8.71 11.3c-.39.39-.39 1.0"
+                "2 0 1.41l4.59 4.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.4"
+                "1L10.83 12l3.88-3.88c.39-.39.38-1.03 0-1.41z"
+            ),
+        )
+        tag.add(_path)
+        return tag
+
+
+class IconNextPage(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-6 h-6 m-1 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="currentColor",
+            viewBox="0 0 24 24",
+        )
+        _path = path(
+            d=(
+                "M9.29 6.71c-.39.39-.39 1.02 0 1.41L13.17 12l-3.88 3.88c-.39.39"
+                "-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l4.59-4.59c.39-.39.39-1.0"
+                "2 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01z"
+            ),
+        )
+        tag.add(_path)
+        return tag
+
+
+class IconLastPage(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-6 h-6 m-1 pointer-events-none",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="currentColor",
+            viewBox="0 0 24 24",
+        )
+        _path = path(
+            d=(
+                "M6.29 8.11L10.18 12l-3.89 3.89c-.39.39-.39 1.02 0 1.41.39.39 1"
+                ".02.39 1.41 0l4.59-4.59c.39-.39.39-1.02 0-1.41L7.7 6.7c-.39-.3"
+                "9-1.02-.39-1.41 0-.38.39-.38 1.03 0 1.41zM17 6c.55 0 1 .45 1 1"
+                "v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1z"
+            )
+        )
         tag.add(_path)
         return tag
