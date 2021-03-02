@@ -1,68 +1,66 @@
-from typing import Any, Dict, List
+from copy import deepcopy
+import os
+from typing import List
 
 from pydantic import BaseModel
 
-from giotto.elements import Box, Input, Table, Text, Button, Row
+from giotto.elements import Box, Button, Table, Text
+from giotto.icons import IconBin, IconDetails, IconPlay, IconStop
 from giotto.navigation import Sidebar
 from giotto.templates import AppLayout, FrameTemplate
 from giotto.transformers import Transformer
 from giotto.utils import turbo_frame
-from giotto.icons import IconSearch, IconDetails, IconStop, IconPlay, IconBin
 import mockapis
 
-
-def transform_data_jobs(data: Dict):
-    data = data["data"]
-
-    def remove_first_and_last(x):
-        return str(x)[1:-1]
-
-    cols_for_strip = ["func_args", "crons", "upstream", "downstream", "func_kwargs"]
-    formatter = {
-        "created_at": lambda x: x[:10],
-        **{k: remove_first_and_last for k in cols_for_strip},
-    }
-    new_data = []
-    for row in data:
-        new_row = dict()
-        new_row["Action"] = Button(
-            description="",
-            color="blue",
-            name=row["name"] + "_details",
-            icon=IconDetails(),
-            action="swap",
-            is_flex=True,
-            target_frame="schedulerframe",
-        )
-        for key, value in row.items():
-            new_key = key.replace("_", " ").title()
-            new_row[new_key] = value
-            if key in formatter:
-                new_row[new_key] = formatter[key](value)
-        new_data.append(new_row)
-    return new_data
+domain = os.getenv("DOMAIN")
 
 
-def transform_data_jobruns(data: Dict):
-    data = data["data"]
-    return data
+class JobsTransformer(Transformer):
+    def transform(self):
+        data = deepcopy(self.data["data"])
+
+        def remove_first_and_last(x):
+            return str(x)[1:-1]
+
+        cols_for_strip = ["func_args", "crons", "upstream", "downstream", "func_kwargs"]
+        formatter = {
+            "created_at": lambda x: x[:10],
+            **{k: remove_first_and_last for k in cols_for_strip},
+        }
+        new_data = []
+        for row in data:
+            new_row = dict()
+            new_row["Action"] = Button(
+                description="",
+                color="blue",
+                name=row["name"] + "_details",
+                icon=IconDetails(),
+                action="swap",
+                is_flex=True,
+                target_frame="schedulerframe",
+            )
+            for key, value in row.items():
+                new_key = key.replace("_", " ").title()
+                new_row[new_key] = value
+                if key in formatter:
+                    new_row[new_key] = formatter[key](value)
+            new_data.append(new_row)
+        return new_data
 
 
-jobs_data = transform_data_jobs(mockapis.jobs)
-jobruns_data = Transformer.from_dict(mockapis.jobruns).apply(transform_data_jobruns).data
+class JobRunsTransformer(Transformer):
+    def transform(self):
+        data = deepcopy(self.data["data"])
+        return data
 
 
-inp = Input(placeholder="Search Job...")
+jobs_tr = JobsTransformer.from_dict(mockapis.jobs)
+# jobs_tr = JobsTransformer.from_api(url=f"{domain}/api/scheduler/job")
+jobs_data = jobs_tr.transform()
+
 table_jobs = Table(data=jobs_data)
-table_jobruns2 = Table(data=jobruns_data)
-# class
-# route = "/some/api"
-# job_name = ...
-# get /some/api?job_name=...
-# transform jobs into [{}]
-# from_dict
-# Table.from_function(transform_data_jobruns, "/some/api", params)
-# Frame
+
+
 class JobrunsFrame(FrameTemplate):
     route = "/frameurl"
     content: List[BaseModel] = []
@@ -96,20 +94,21 @@ class JobrunsFrame(FrameTemplate):
                 action="swap",
                 name=job_name + "_unregister",
             )
-            # buttons = Row(contents=[run_btn, stop_btn])
             box = Box(contents=[title, run_btn, stop_btn, unregister_btn]).to_tag()
-            table_jobruns = Table(data=mockapis.jobruns_raw[job_name]["data"]).to_tag()
+
+            # jobruns_tr = JobRunsTransformer.from_api(
+            #     url=f"{domain}/api/scheduler/jobrun/{job_name}"
+            # )
+            # data = jobruns_tr.transform()
+            data = mockapis.jobruns_raw[job_name]["data"]
+            table_jobruns = Table(data=data).to_tag()
             tag.add(box)
             tag.add(table_jobruns)
         return tag.render()
 
 
-# Page
-content = Box(contents=[inp, table_jobs])
-
-
 class SchedulerAppLayout(AppLayout):
     route = "/scheduler"
     sidebar = Sidebar(items=mockapis.sidebar_items)
-    content: List[BaseModel] = [content, JobrunsFrame()]
+    content: List[BaseModel] = [table_jobs, JobrunsFrame()]
     site_name = "Scheduler App"
