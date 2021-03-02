@@ -86,7 +86,7 @@ class AppLayout(Template):
 
     def _to_tag(self):
         tag = self._content
-        _main = main(_class="flex flex-1 flex-col p-3")
+        _main = main(_class="overflow-x-auto p-8 w-full")
         for item in self.content:
             _main.add(item.to_tag())
         tag.add(_main)
