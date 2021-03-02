@@ -160,16 +160,18 @@ class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
-    max_rows: int = 10
+    max_rows: int = 1
 
     def _to_tag(self):
         tag = div(
-            _class="container overflow-x-auto grid mt-2 shadow sm:rounded-lg",
+            _class="mt-2 shadow sm:rounded-lg",
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
-        _table = table(self.thead, self.tbody)
-        tag.add(_table, self.pagination)
+        _div_table = div(_class="overflow-x-auto")
+        _table = table(self.thead, self.tbody, _class="w-full")
+        _div_table.add(_table)
+        tag.add(_div_table, self.pagination)
         return tag
 
     @property
@@ -189,8 +191,7 @@ class Table(Partial):
         for counter, row in enumerate(self.data):
             bg = "" if counter % 2 == 0 else "bg-gray-50"
             _tr = tr(
-                _class=f"{bg} hover:bg-gray-200 border-b border-gray-200",
-                data_table_target="row",
+                _class=f"{bg} hover:bg-gray-200 border-b border-gray-200", data_table_target="row",
             )
             for value in row.values():
                 if isinstance(value, Partial):
@@ -234,11 +235,7 @@ class Table(Partial):
             last_button,
             _class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
         )
-        _div = div(
-            desc,
-            buttons,
-            _class="flex justify-between items-center sm:px-2 sm:py-2",
-        )
+        _div = div(desc, buttons, _class="flex justify-between items-center sm:px-2 sm:py-2",)
         return _div
 
 
