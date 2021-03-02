@@ -9,8 +9,11 @@ from dominate.tags import (
     h1,
     img,
     li,
+    nav,
     option,
+    p,
     select,
+    span,
     table,
     tbody,
     td,
@@ -18,15 +21,19 @@ from dominate.tags import (
     thead,
     tr,
     ul,
-    p,
-    span,
-    nav,
 )
 from dominate.util import raw
 from markdown import markdown
 
 from .base import Partial
-from .icons import Icon, IconSearch, IconFirstPage, IconPreviousPage, IconNextPage, IconLastPage
+from .icons import (
+    Icon,
+    IconFirstPage,
+    IconLastPage,
+    IconNextPage,
+    IconPreviousPage,
+    IconSearch,
+)
 from .utils import path, svg, turbo_frame
 
 
@@ -153,7 +160,7 @@ class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
-    max_rows: int = 2
+    max_rows: int = 10
 
     def _to_tag(self):
         tag = div(
@@ -161,14 +168,12 @@ class Table(Partial):
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
-        _thead = self._get_thead()
-        _tbody = self._get_tbody()
-        _table = table(_thead, _tbody)
-        pagination = self._get_pagination()
-        tag.add(_table, pagination)
+        _table = table(self.thead, self.tbody)
+        tag.add(_table, self.pagination)
         return tag
 
-    def _get_thead(self):
+    @property
+    def thead(self):
         _thead = thead(_class="bg-primary text-white")
         if self.data:
             _thr = tr(_class="bg-dark text-white")
@@ -178,7 +183,8 @@ class Table(Partial):
             _thead.add(_thr)
         return _thead
 
-    def _get_tbody(self):
+    @property
+    def tbody(self):
         _tbody = tbody()
         for counter, row in enumerate(self.data):
             bg = "" if counter % 2 == 0 else "bg-gray-50"
@@ -196,7 +202,8 @@ class Table(Partial):
             _tbody.add(_tr)
         return _tbody
 
-    def _get_pagination(self):
+    @property
+    def pagination(self):
         desc = Text(value=f"{len(self.data)} results", color="gray-500").to_tag()
         button_class = (
             "relative inline-flex items-center px-2 py-2 border border-gray-300"
