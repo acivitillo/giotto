@@ -104,7 +104,10 @@ class JobrunsFrame(FrameTemplate):
             table_jobruns = Table(data=data).to_tag()
             tag.add(box)
             tag.add(table_jobruns)
-        return tag.render()
+            return tag.render()
+        else:
+            tag = turbo_frame(_id="schedulerframe")
+            return tag.render()
 
 
 class SchedulerAppLayout(AppLayout):
