@@ -24,8 +24,8 @@ class Template(BaseModel):
     @property
     def head(self):
         h = head()
-        h.add(script(src="assets/dist/main.js", defer=True))
-        h.add(link(href="assets/dist/styles.css", rel="stylesheet"))
+        h.add(script(src="giotto-statics/main.js", defer=True))
+        h.add(link(href="giotto-statics/styles.css", rel="stylesheet"))
         return h
 
     @property
