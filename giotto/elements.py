@@ -128,8 +128,9 @@ class Button(Partial):
     description: str = ""
     icon: Optional[Icon]
     color: str = "blue"
-    action: str
     name: str = ""
+    hx_post: str
+    hx_target: str = ""
     is_flex: bool = False
     target_frame: str = ""
 
@@ -137,21 +138,23 @@ class Button(Partial):
         size = "px-5 h-12 "
         if self.is_flex:
             size = ""
-        tag = button(
-            data_controller="swapurl",
-            data_action=f"click->swapurl#{self.action}",
-            data_swapurl_name_value=self.name,
-            data_swapurl_frame_value=self.target_frame,
-            _class=(
-                f"uppercase mt-1 {size}rounded-lg bg-{self.color}-400"
-                f" items-center font-medium text-black max-w-max shadow-sm cursor-pointer"
-                f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
-                f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
-            ),
+        _class = (
+            f"uppercase mt-1 {size}rounded-lg bg-{self.color}-400"
+            f" items-center font-medium text-black max-w-max shadow-sm cursor-pointer"
+            f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
+            f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
         )
+        if self.hx_target != "":
+            tag = button(
+                data_hx_post=self.hx_post,
+                data_hx_swap="outerHTML",
+                data_hx_target=self.hx_target,
+                _class=_class,
+            )
+        else:
+            tag = button(data_hx_post=self.hx_post, data_hx_swap="outerHTML", _class=_class)
         if self.icon:
             tag.add(self.icon.to_tag())
-        # _desc = p(self.description, _class="font-semibold")
         tag.add(span(self.description))
         return tag
 
@@ -191,7 +194,8 @@ class Table(Partial):
         for counter, row in enumerate(self.data):
             bg = "" if counter % 2 == 0 else "bg-gray-50"
             _tr = tr(
-                _class=f"{bg} hover:bg-gray-200 border-b border-gray-200", data_table_target="row",
+                _class=f"{bg} hover:bg-gray-200 border-b border-gray-200",
+                data_table_target="row",
             )
             for value in row.values():
                 if isinstance(value, Partial):
@@ -235,7 +239,11 @@ class Table(Partial):
             last_button,
             _class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
         )
-        _div = div(desc, buttons, _class="flex justify-between items-center sm:px-2 sm:py-2",)
+        _div = div(
+            desc,
+            buttons,
+            _class="flex justify-between items-center sm:px-2 sm:py-2",
+        )
         return _div
 
 
