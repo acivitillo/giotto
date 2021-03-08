@@ -39,8 +39,7 @@ class AppSite(BaseModel):
         b.add(container)
         return b
 
-    @property
-    def html(self):
+    def to_html(self):
         d = doc()
         d.add(self.head, self.body)
         return d.render()

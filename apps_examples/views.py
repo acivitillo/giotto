@@ -14,15 +14,21 @@ class BaseView(BaseModel):
     data: Dict = {}
     url_prefix: str = ""
 
+    def to_tag(self):
+        return div()
+
+    def to_html(self):
+        return self.to_tag().render()
+
 
 class JobsTable(BaseView):
-    data: Dict = {}
-    url_prefix: str = ""
-
     @classmethod
     def from_dict(cls, url_prefix: str, data: Any):
-        cls.url_prefix = url_prefix
+        new_data = cls.format_data(url_prefix, data)
+        return cls(data={"table": new_data}, url_prefix=url_prefix)
 
+    @staticmethod
+    def format_data(url_prefix: str, data: Any) -> List[Dict]:
         def remove_first_and_last(x):
             return str(x)[1:-1]
 
@@ -35,13 +41,14 @@ class JobsTable(BaseView):
         for row in data:
             new_row = dict()
             name = row["name"] + "_details"
+            job_name = row["name"]
             new_row["Action"] = Button(
                 description="",
                 color="blue",
                 name=name,
                 icon=IconDetails(),
                 is_flex=True,
-                hx_post=f"/{url_prefix}/jobruns?name={name}",
+                hx_post=f"/{url_prefix}/jobruns/{job_name}",
                 hx_target="#jobs_table",
             )
             for key, value in row.items():
@@ -50,33 +57,33 @@ class JobsTable(BaseView):
                 if key in formatter:
                     new_row[new_key] = formatter[key](value)
             new_data.append(new_row)
-        return cls(data={"table": new_data}, url_prefix=url_prefix)
+        return new_data
 
-    @property
-    def tag(self):
+    def to_tag(self):
         tag = Table(data=self.data["table"]).to_tag()
         return tag
 
 
 class JobRunsTable(BaseView):
     jobrun_status: str = ""
+    job_name: str
 
     @classmethod
     def from_dict(cls, job_name: str, data: Any, url_prefix: str = ""):
-        tabledata = deepcopy(data["data"])
-        tabledata.sort(key=lambda item: item.get("created_at"))
-        data = {"table": tabledata, "job_name": job_name, "url_prefix": url_prefix}
-        return cls(data=data, url_prefix=url_prefix)
+        data = cls.format_data(data)
+        return cls(data={"table": data}, job_name=job_name, url_prefix=url_prefix)
 
-    @property
-    def tag(self):
+    @staticmethod
+    def format_data(data: Any) -> List[Dict]:
+        data = deepcopy(data["data"])
+        data.sort(key=lambda item: item.get("created_at"))
+        return data
+
+    def to_tag(self):
         tag = div(_id="jobs_table")
         data = self.data["table"]
-        prefix = self.data["url_prefix"]
-        if "details" in self.data["job_name"]:
-            job_name = self.data["job_name"][:-8]
-        else:
-            job_name = self.data["job_name"]
+        url_prefix = self.url_prefix
+        job_name = self.job_name
         title = Text(value=job_name, size="4xl", weight="bold")
         if self.jobrun_status != "":  # mock "running" case
             record = data[0]
@@ -86,7 +93,7 @@ class JobRunsTable(BaseView):
             description="Run",
             color="green",
             icon=IconPlay(),
-            hx_post=f"/{prefix}/job_run?job_name={job_name}",
+            hx_post=f"/{url_prefix}/jobs/{job_name}/run",
             hx_target="#jobs_table",
         )
         stop_btn = Button(
@@ -103,7 +110,7 @@ class JobRunsTable(BaseView):
             description="Refresh",
             color="purple",
             icon=IconBin(),
-            hx_post=f"/{prefix}/job_refresh?job_name={job_name}",
+            hx_post=f"/{url_prefix}/jobruns/{job_name}/refresh",
             hx_target="#jobs_table",
         )
         table_jobruns = Table(data=data, max_rows=5).to_tag()
