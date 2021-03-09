@@ -131,6 +131,7 @@ class Button(Partial):
     name: str = ""
     hx_post: str
     hx_target: str = ""
+    hx_confirm: str = ""
     is_flex: bool = False
     target_frame: str = ""
 
@@ -144,15 +145,9 @@ class Button(Partial):
             f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
             f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
         )
-        if self.hx_target != "":
-            tag = button(
-                data_hx_post=self.hx_post,
-                data_hx_swap="outerHTML",
-                data_hx_target=self.hx_target,
-                _class=_class,
-            )
-        else:
-            tag = button(data_hx_post=self.hx_post, data_hx_swap="outerHTML", _class=_class)
+        actions =  ["hx_target", "hx_confirm"]
+        hx_kwargs = {f"data_{action}": self.dict()[action] for action in actions if self.dict().get(action)} 
+        tag = button(_class=_class, data_hx_post=self.hx_post, data_hx_swap="outerHTML", **hx_kwargs)
         if self.icon:
             tag.add(self.icon.to_tag())
         tag.add(span(self.description))
