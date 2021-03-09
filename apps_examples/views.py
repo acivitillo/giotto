@@ -1,13 +1,11 @@
 from copy import deepcopy
-from pydantic import BaseModel
 from typing import Any, Dict, List
 
-from dominate.tags import div, p, script, head, body, button, input_
-from dominate.util import raw
-from dominate import document as doc
+from dominate.tags import div
+from pydantic import BaseModel
 
 from giotto.elements import Box, Button, Table, Text
-from giotto.icons import IconBin, IconDetails, IconPlay, IconStop
+from giotto.icons import IconBin, IconDetails, IconPlay, IconRefresh, IconStop
 
 
 class BaseView(BaseModel):
@@ -109,7 +107,7 @@ class JobRunsTable(BaseView):
         refresh_btn = Button(
             description="Refresh",
             color="purple",
-            icon=IconBin(),
+            icon=IconRefresh(),
             hx_post=f"/{url_prefix}/jobruns/{job_name}/refresh",
             hx_target="#jobs_table",
         )
