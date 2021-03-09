@@ -21,8 +21,6 @@ from dominate.tags import (
     thead,
     tr,
     ul,
-    colgroup,
-    col,
 )
 from dominate.util import raw
 from markdown import markdown
@@ -147,9 +145,13 @@ class Button(Partial):
             f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
             f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
         )
-        actions =  ["hx_target", "hx_confirm"]
-        hx_kwargs = {f"data_{action}": self.dict()[action] for action in actions if self.dict().get(action)} 
-        tag = button(_class=_class, data_hx_post=self.hx_post, data_hx_swap="outerHTML", **hx_kwargs)
+        actions = ["hx_target", "hx_confirm"]
+        hx_kwargs = {
+            f"data_{action}": self.dict()[action] for action in actions if self.dict().get(action)
+        }
+        tag = button(
+            _class=_class, data_hx_post=self.hx_post, data_hx_swap="outerHTML", **hx_kwargs
+        )
         if self.icon:
             tag.add(self.icon.to_tag())
         tag.add(span(self.description))
@@ -169,19 +171,10 @@ class Table(Partial):
             data_table_max_page_rows_value=self.max_rows,
         )
         _div_table = div(_class="overflow-x-auto")
-        _table = table(self.colgroup, self.thead, self.tbody, _class="w-full table-fixed")
+        _table = table(self.thead, self.tbody, _class="w-full table-fixed")
         _div_table.add(_table)
         tag.add(_div_table, self.pagination)
         return tag
-
-    @property
-    def colgroup(self):
-        _colgroup = colgroup()
-        if self.data:
-            for key in self.data[0].keys():
-                _col = col(_style="width: 100px")
-                _colgroup.add(_col)
-        return _colgroup
 
     @property
     def thead(self):
@@ -189,7 +182,12 @@ class Table(Partial):
         if self.data:
             _thr = tr(_class="bg-dark text-white")
             for key in self.data[0].keys():
-                _th = th(key, _class="whitespace-nowrap py-2 p-3 resize-x truncate")
+                _span = span(key, _title=key)
+                _th = th(
+                    _span,
+                    _class="whitespace-nowrap py-2 p-3 h-6 resize-x truncate",
+                    _style="width: 100px",
+                )
                 _thr.add(_th)
             _thead.add(_thr)
         return _thead
@@ -200,7 +198,7 @@ class Table(Partial):
         for counter, row in enumerate(self.data):
             bg = "" if counter % 2 == 0 else "bg-gray-50"
             _tr = tr(
-                _class=f"{bg} hover:bg-gray-200 border-b border-gray-200 truncate",
+                _class=f"{bg} hover:bg-gray-200 border-b h-6 border-gray-200 truncate",
                 data_table_target="row",
             )
             for value in row.values():
@@ -208,7 +206,8 @@ class Table(Partial):
                     _td = td(_class="text-center p-2 border-0")
                     _td.add(value.to_tag())
                 else:
-                    _td = td(str(value), _class="text-center p-2 border-0 truncate")
+                    _span = span(str(value), _title=str(value))
+                    _td = td(_span, _class="text-center p-2 border-0 truncate")
                 _tr.add(_td)
             _tbody.add(_tr)
         return _tbody

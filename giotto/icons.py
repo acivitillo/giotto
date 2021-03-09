@@ -90,7 +90,7 @@ class IconSearch(Icon):
 class IconDetails(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="w-6 h-6 m-2 pointer-events-none",
+            _class="w-5 h-5 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             fill="none",
             viewBox="0 0 24 24",
