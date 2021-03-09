@@ -1,117 +1,47 @@
 from copy import deepcopy
-import os
-from typing import List
-
 from pydantic import BaseModel
+from typing import List, Any
+from fastapi import APIRouter
+from fastapi.responses import HTMLResponse
 
-from giotto.elements import Box, Button, Table, Text
-from giotto.icons import IconBin, IconDetails, IconPlay, IconStop
+from dominate.tags import div, p, script, head, body, button, input_
+from dominate.util import raw
+from dominate import document as doc
+
+from giotto.templates import AppSite
 from giotto.navigation import Sidebar
-from giotto.templates import AppLayout, FrameTemplate
-from giotto.transformers import Transformer
-from giotto.utils import turbo_frame
+from giotto.icons import IconBin, IconDetails, IconPlay, IconStop
+from giotto.elements import Box, Button, Table, Text
+from .views import JobRunsTable, JobsTable
 import mockapis
 
-domain = os.getenv("DOMAIN")
+prefix = "scheduler"
+router = APIRouter(prefix=f"/{prefix}")
 
 
-class JobsTransformer(Transformer):
-    def transform(self):
-        data = deepcopy(self.data["data"])
-
-        def remove_first_and_last(x):
-            return str(x)[1:-1]
-
-        cols_for_strip = ["func_args", "crons", "upstream", "downstream", "func_kwargs"]
-        formatter = {
-            "created_at": lambda x: x[:10],
-            **{k: remove_first_and_last for k in cols_for_strip},
-        }
-        new_data = []
-        for row in data:
-            new_row = dict()
-            new_row["Action"] = Button(
-                description="",
-                color="blue",
-                name=row["name"] + "_details",
-                icon=IconDetails(),
-                action="swap",
-                is_flex=True,
-                target_frame="schedulerframe",
-            )
-            for key, value in row.items():
-                new_key = key.replace("_", " ").title()
-                new_row[new_key] = value
-                if key in formatter:
-                    new_row[new_key] = formatter[key](value)
-            new_data.append(new_row)
-        return new_data
+@router.get("/", response_class=HTMLResponse)
+def index():
+    site = AppSite(sidebar=Sidebar(items=mockapis.sidebar_items))
+    table_jobs = JobsTable.from_dict(prefix, mockapis.jobs["data"]).to_tag()
+    site.content = div(table_jobs, div(_id="jobs_table"))
+    return site.to_html()
 
 
-class JobRunsTransformer(Transformer):
-    def transform(self):
-        data = deepcopy(self.data["data"])
-        return data
+@router.post("/jobruns/{job_name}", response_class=HTMLResponse, tags=["JobRunsTable"])
+def read_jobruns(job_name: str):
+    view = JobRunsTable.from_dict(url_prefix=prefix, job_name=job_name, data=mockapis.jobruns)
+    return view.to_html()
 
 
-jobs_tr = JobsTransformer.from_dict(mockapis.jobs)
-# jobs_tr = JobsTransformer.from_api(url=f"{domain}/api/scheduler/job")
-jobs_data = jobs_tr.transform()
-
-table_jobs = Table(data=jobs_data)
-
-
-class JobrunsFrame(FrameTemplate):
-    route = "/frameurl"
-    content: List[BaseModel] = []
-    name = "schedulerframe"
-
-    def to_html(self, name: str = "", route: str = ""):
-        if route == "":
-            route = self.route
-        tag = turbo_frame(_id="schedulerframe", src=route)
-        if name[-8:] == "_details":
-            job_name = name[:-8]
-            title = Text(value=job_name, size="4xl", weight="bold")
-            run_btn = Button(
-                description="Run",
-                color="green",
-                icon=IconPlay(),
-                action="swap",
-                name=job_name + "_run",
-            )
-            stop_btn = Button(
-                description="Stop",
-                color="red",
-                icon=IconStop(),
-                action="swap",
-                name=job_name + "_stop",
-            )
-            unregister_btn = Button(
-                description="Unregister",
-                color="purple",
-                icon=IconBin(),
-                action="swap",
-                name=job_name + "_unregister",
-            )
-            box = Box(contents=[title, run_btn, stop_btn, unregister_btn]).to_tag()
-
-            # jobruns_tr = JobRunsTransformer.from_api(
-            #     url=f"{domain}/api/scheduler/jobrun/{job_name}"
-            # )
-            # data = jobruns_tr.transform()
-            data = mockapis.jobruns_raw[job_name]["data"]
-            table_jobruns = Table(data=data).to_tag()
-            tag.add(box)
-            tag.add(table_jobruns)
-            return tag.render()
-        else:
-            tag = turbo_frame(_id="schedulerframe")
-            return tag.render()
+@router.post("/jobruns/{job_name}/refresh", response_class=HTMLResponse, tags=["JobRunsTable"])
+def refresh_jobruns(job_name: str):
+    view = JobRunsTable.from_dict(url_prefix=prefix, job_name=job_name, data=mockapis.jobruns)
+    view.jobrun_status = "success"
+    return view.to_html()
 
 
-class SchedulerAppLayout(AppLayout):
-    route = "/scheduler"
-    sidebar = Sidebar(items=mockapis.sidebar_items)
-    content: List[BaseModel] = [table_jobs, JobrunsFrame()]
-    site_name = "Scheduler App"
+@router.post("/jobs/{job_name}/run", response_class=HTMLResponse, tags=["JobRunsTable"])
+def run_job(job_name: str):
+    view = JobRunsTable.from_dict(url_prefix=prefix, job_name=job_name, data=mockapis.jobruns)
+    view.jobrun_status = "running"
+    return view.to_html()

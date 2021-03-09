@@ -137,7 +137,10 @@ class IconStop(Icon):
         _path = path(
             fill_rule="evenodd",
             clip_rule="evenodd",
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z",
+            d=(
+                "M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001"
+                " 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"
+            ),
         )
         tag.add(_path)
         return tag
@@ -238,6 +241,28 @@ class IconLastPage(Icon):
                 "9-1.02-.39-1.41 0-.38.39-.38 1.03 0 1.41zM17 6c.55 0 1 .45 1 1"
                 "v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1z"
             )
+        )
+        tag.add(_path)
+        return tag
+
+
+class IconRefresh(Icon):
+    def _to_tag(self):
+        tag = svg(
+            _class="w-auto h-6 m-1 inline-block",
+            xmlns="http://www.w3.org/2000/svg",
+            fill="none",
+            viewBox="0 0 24 24",
+            stroke="currentColor",
+        )
+        _path = path(
+            stroke_linecap="round",
+            stroke_linejoin="round",
+            stroke_width="2",
+            d=(
+                "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-."
+                "581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            ),
         )
         tag.add(_path)
         return tag

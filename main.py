@@ -8,66 +8,14 @@ from pydantic import BaseModel
 
 from giotto.elements import Box, Button, Input, Select, Text, Column
 from giotto.navigation import Sidebar, TopBar
-from giotto.templates import AppLayout, FrameTemplate
 from giotto.utils import turbo_frame
 import mockapis
-from apps_examples.scheduler import SchedulerAppLayout, JobrunsFrame
 
 app = FastAPI()
 
-btn1 = Button(description="Step 1", action="swap", name="start", target_frame="frametest")
-btn2 = Button(description="Step 2", action="swap", name="step2", target_frame="frametest")
-btn_back = Button(description="go back", action="reset", target_frame="frametest")
-sel_fruit = Select(options=["oranges"])
-text = Text(
-    value="Everything inside the border is a frame. Click the button to see how the frame works"
-)
-explain_frame = Box(contents=[text])
-inp = Input()
-inp2 = Input()
-
-# Frame
-class FiltersFrame(FrameTemplate):
-    route = "/frameurl"
-    content: List[BaseModel] = [sel_fruit, inp, inp2, explain_frame]
-    name = "frametest"
-
-    def to_html(self, name: str = "", route: str = ""):
-        if route == "":
-            route = self.route
-        tag = turbo_frame(_id=self.name, src=route)
-        if name == "start":
-            el = Select(options=["Apples"]).to_tag()
-            tag.add(el)
-            text = Text(
-                value=f"the button was clicked and the name is {name}."
-                " Note how we can change everything, including"
-                " the select on the left."
-            ).to_tag()
-            tag.add(text)
-            return tag.render()
-        elif name == "step2":
-            text = Text(
-                value="You see? Now we changed the frame again - only this text ;)"
-            ).to_tag()
-            tag.add(text)
-            return tag.render()
-        else:
-            tag = turbo_frame(_id=self.name)
-            for item in self.content:
-                tag.add(item.to_tag())
-            return tag.render()
+app.mount("/giotto-statics", StaticFiles(packages=["giotto"]))
 
 
-# Page
-class TestAppLayout(AppLayout):
-    route = "/testapp"
-    sidebar = Sidebar(items=mockapis.sidebar_items)
-    content: List[BaseModel] = [FiltersFrame(), btn1, btn2, btn_back]
+from apps_examples.scheduler import router as example_scheduler
 
-
-app.add_api_route(**TestAppLayout().to_register())
-# app.add_api_route(**FiltersFrame().to_register())
-app.add_api_route(**SchedulerAppLayout().to_register())
-app.add_api_route(**JobrunsFrame().to_register())
-app.mount("/assets/dist", StaticFiles(directory="giotto/statics/dist"), name="assets")
+app.include_router(example_scheduler)
