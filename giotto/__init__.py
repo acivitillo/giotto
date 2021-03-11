@@ -3,7 +3,6 @@ from .icons import IconBin, IconDetails, IconPlay, IconStop
 from .navigation import Sidebar
 from .templates import AppSite
 from .transformers import Transformer
-from .utils import turbo_frame
 
 
 __version__ = "0.1.0rc0"

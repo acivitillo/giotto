@@ -1,19 +1,12 @@
-from copy import deepcopy
-from pydantic import BaseModel
-from typing import List, Any
+from dominate.tags import div
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 
-from dominate.tags import div, p, script, head, body, button, input_
-from dominate.util import raw
-from dominate import document as doc
-
-from giotto.templates import AppSite
 from giotto.navigation import Sidebar
-from giotto.icons import IconBin, IconDetails, IconPlay, IconStop
-from giotto.elements import Box, Button, Table, Text
-from .views import JobRunsTable, JobsTable
+from giotto.templates import AppSite
 import mockapis
+
+from .views import JobRunsTable, JobsTable
 
 prefix = "scheduler"
 router = APIRouter(prefix=f"/{prefix}")

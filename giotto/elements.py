@@ -1,17 +1,14 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from dominate.tags import (
     _input,
     a,
     button,
     div,
-    h1,
-    img,
     li,
     nav,
     option,
-    p,
     select,
     span,
     table,
@@ -34,7 +31,7 @@ from .icons import (
     IconPreviousPage,
     IconSearch,
 )
-from .utils import path, svg, turbo_frame
+from .utils import path, svg
 
 
 class Select(Partial):
@@ -244,7 +241,11 @@ class Table(Partial):
             last_button,
             _class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
         )
-        _div = div(desc, buttons, _class="flex justify-between items-center sm:px-2 sm:py-2",)
+        _div = div(
+            desc,
+            buttons,
+            _class="flex justify-between items-center sm:px-2 sm:py-2",
+        )
         return _div
 
 
@@ -272,7 +273,7 @@ class Tab(Partial):
 
 class TabContainer(Partial):
     tabs: List[Tab]
-    ### NEEDS TO BE CALCULATED SOMEHOW
+    # NEEDS TO BE CALCULATED SOMEHOW
     clicked: Tab
 
     def _to_tag(self):
@@ -294,8 +295,6 @@ class TabContainer(Partial):
                 )
         _style.add(_ul)
         _tag.add(_style)
-        ###  WE NEED TO APPEND TURBO FRAME
-        # _tag.add(turbo_frame(self.clicked, url=self.clicked.name))
 
 
 # USER CODE

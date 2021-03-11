@@ -10,9 +10,5 @@ class svg(dom_tag):
     pass
 
 
-class turbo_frame(dom_tag, metaclass=tag_hyphenate):
-    pass
-
-
 class path(dom_tag):
     pass
