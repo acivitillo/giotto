@@ -22,7 +22,7 @@ class Frame(BaseModel):
 
 
 class Partial(BaseModel):
-    frame: Optional[Frame] = None
+    kwargs: Dict[str, Any] = {}
 
     @classmethod
     def from_api(cls, url):
