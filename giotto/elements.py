@@ -158,10 +158,12 @@ class Table(Partial):
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
+        filters = self.filters
         _div_table = div(_class="overflow-x-auto")
         _table = table(self.thead, self.tbody, _class="w-full table-fixed")
         _div_table.add(_table)
-        tag.add(self.filters, _div_table, self.pagination)
+        pagination = self.pagination
+        tag.add(filters, _div_table, pagination)
         return tag
 
     @property
@@ -194,9 +196,10 @@ class Table(Partial):
     def tbody(self):
         _tbody = tbody()
         for counter, row in enumerate(self.data):
-            bg = "" if counter % 2 == 0 else "bg-gray-50"
+            bg = "" if counter % 2 == 0 else "bg-gray-50 "
+            hidden = "" if counter < self.max_rows else " hidden"
             _tr = tr(
-                _class=f"{bg} hover:bg-gray-200 border-b h-6 border-gray-200 truncate",
+                _class=f"{bg}hover:bg-gray-200 border-b h-6 border-gray-200 truncate{hidden}",
                 data_table_target="row",
             )
             for value in row.values():

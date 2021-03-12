@@ -6,8 +6,18 @@ export default class extends Controller {
 
     initialize() {
         this.startIndex = 0;
-        this.rowTargets.forEach(element => { element.filteredIn = true });
-        this.showCurrentPage()
+        this.total = this.rowTargets.length;
+
+        this.showedRows = []; // indexes of rows showed at the page
+        this.filteredInRows = []; // indexes of rows that satisfy filter
+        for (var i = 0; i < this.maxPageRowsValue; i++) {
+            this.showedRows.push(i)
+        };
+
+        for (var i = 0; i < this.total; i++) {
+            this.filteredInRows.push(i)
+        };
+
     };
 
     firstPage() {
@@ -23,40 +33,46 @@ export default class extends Controller {
     };
 
     nextPage() {
-        if (this.startIndex + this.maxPageRowsValue < this.filteredInIndexes.length) {
+        if (this.startIndex + this.maxPageRowsValue < this.filteredInRows.length) {
             this.startIndex += this.maxPageRowsValue
             this.showCurrentPage()
         }
     };
 
     lastPage() {
-        this.startIndex = this.filteredInIndexes.length - ((this.filteredInIndexes.length - 1) % this.maxPageRowsValue) - 1
+        console.log(this.filteredInRows.length, this.maxPageRowsValue)
+        this.startIndex = this.filteredInRows.length - ((this.filteredInRows.length - 1) % this.maxPageRowsValue) - 1
         this.showCurrentPage()
     }
 
     filter() {
-        this.rowTargets.forEach(element => {
-            var includesInput = element.innerText.toLowerCase().includes(this.input)
-            if (!includesInput) {
-                element.filteredIn = false;
-            } else {
-                element.filteredIn = true;
-            }
-        });
-        this.totalTarget.innerText = this.filteredInIndexes.length
-        this.startIndex = 0;
-        this.showCurrentPage()
+        if (this.input.length != 1) {
+            this.filteredInRows = [];
+            this.rowTargets.forEach((element, index) => {
+                var includesInput = element.innerText.toLowerCase().includes(this.input)
+                if (includesInput) {
+                    this.filteredInRows.push(index);
+                }
+            });
+
+            this.totalTarget.innerText = this.filteredInRows.length;
+            this.startIndex = 0;
+            this.showCurrentPage()
+        }
     }
 
     showCurrentPage() {
-        // hide all rows
-        this.rowTargets.forEach(element => {
-            element.classList.add("hidden")
+        console.log(this.showedRows)
+        // hide showed rows
+        this.showedRows.forEach(element => {
+            this.rowTargets[element].classList.add("hidden")
         });
+        this.showedRows = [];
         // unhide rows that are filtered in and fit in pagination interval
-        this.filteredInIndexes.forEach((realIndex, index) => {
+        this.filteredInRows.forEach((realIndex, index) => {
             if (index >= this.startIndex & index < this.startIndex + this.maxPageRowsValue) {
                 this.rowTargets[realIndex].classList.remove("hidden")
+                this.showedRows.push(realIndex)
             }
         });
     }
@@ -68,16 +84,5 @@ export default class extends Controller {
     get rows() {
         return this.rowTarget.value
     };
-
-    get filteredInIndexes() {
-        var indexes = [];
-        var i;
-        for (i = 0; i < this.rowTargets.length; i++) {
-            if (this.rowTargets[i].filteredIn) {
-                indexes.push(i)
-            }
-        }
-        return indexes
-    }
 
 };
