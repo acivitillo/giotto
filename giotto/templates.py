@@ -8,6 +8,7 @@ from giotto.navigation import Sidebar, TopBar
 
 
 class AppSite(BaseModel):
+    title: str = "Giotto"
     site_name: str = "Site Name"
     sidebar: Sidebar
     content: Any = div()
@@ -33,6 +34,6 @@ class AppSite(BaseModel):
         return b
 
     def to_html(self):
-        d = doc()
+        d = doc(title=self.title)
         d.add(self.head, self.body)
         return d.render()
