@@ -166,10 +166,13 @@ class Table(Partial):
 
     @property
     def filters(self):
-        return Input(
+        div_ = div(_class="relative inline-flex mb-3 p-2")
+        input_ = Input(
             placeholder="Search",
             kwargs=dict(data_action="input->table#filter", data_table_target="input"),
         ).to_tag()
+        div_.add(input_)
+        return div_
 
     @property
     def thead(self):
