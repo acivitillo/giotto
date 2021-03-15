@@ -1,16 +1,14 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
+
 from dominate.tags import (
     _input,
     a,
     button,
     div,
-    h1,
-    img,
     li,
     nav,
     option,
-    p,
     select,
     span,
     table,
@@ -27,32 +25,22 @@ from markdown import markdown
 from .base import Partial
 from .icons import (
     Icon,
+    IconDownarrow,
     IconFirstPage,
     IconLastPage,
     IconNextPage,
     IconPreviousPage,
     IconSearch,
 )
-from .utils import path, svg, turbo_frame
 
 
 class Select(Partial):
     options: List[str]
+    icon: Icon = IconDownarrow()
 
     def _to_tag(self):
         tag = div(_class="relative inline-flex")
-        _svg = svg(
-            _class="w-4 h-3 absolute top-0 right-0 m-4 pointer-events-none",
-            xmlns="http://www.w3.org/2000/svg",
-            viewBox="0 0 412 232",
-        )
-        d = (
-            "M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763"
-            " 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677"
-            " 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592"
-            " 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z"
-        )
-        _svg.add(path(d=d, fill="#648299", fill_rule="nonzero"))
+        _svg = self.icon.to_tag()
         tag.add(_svg)
         _class = (
             "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
@@ -79,6 +67,7 @@ class Input(Partial):
                 " hover:border-gray-400 focus:outline-none appearance-none mt-1"
             ),
             placeholder=self.placeholder,
+            **self.kwargs,
         )
         tag.add(input_)
         tag.add(self.icon.to_tag())
@@ -189,11 +178,23 @@ class Table(Partial):
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
+        filters = self.filters
         _div_table = div(_class="overflow-x-auto")
         _table = table(self.thead, self.tbody, _class="w-full table-fixed")
         _div_table.add(_table)
-        tag.add(_div_table, self.pagination)
+        pagination = self.pagination
+        tag.add(filters, _div_table, pagination)
         return tag
+
+    @property
+    def filters(self):
+        div_ = div(_class="relative inline-flex mb-3 p-2")
+        input_ = Input(
+            placeholder="Search",
+            kwargs=dict(data_action="input->table#filter", data_table_target="input"),
+        ).to_tag()
+        div_.add(input_)
+        return div_
 
     @property
     def thead(self):
@@ -215,9 +216,10 @@ class Table(Partial):
     def tbody(self):
         _tbody = tbody()
         for counter, row in enumerate(self.data):
-            bg = "" if counter % 2 == 0 else "bg-gray-50"
+            bg = "" if counter % 2 == 0 else "bg-gray-50 "
+            hidden = "" if counter < self.max_rows else " hidden"
             _tr = tr(
-                _class=f"{bg} hover:bg-gray-200 border-b h-6 border-gray-200 truncate",
+                _class=f"{bg}hover:bg-gray-200 border-b h-6 border-gray-200 truncate{hidden}",
                 data_table_target="row",
             )
             for value in row.values():
@@ -233,7 +235,8 @@ class Table(Partial):
 
     @property
     def pagination(self):
-        desc = Text(value=f"{len(self.data)} results", color="gray-500").to_tag()
+        total = span(len(self.data), data_table_target="total")
+        desc = div(total, span(" results"), _class="text-gray-500")
         button_class = (
             "relative inline-flex items-center px-2 py-2 border border-gray-300"
             " bg-white text-gray-500 hover:bg-gray-50 focus:outline-none"
@@ -291,7 +294,7 @@ class Tab(Partial):
 
 class TabContainer(Partial):
     tabs: List[Tab]
-    ### NEEDS TO BE CALCULATED SOMEHOW
+    # NEEDS TO BE CALCULATED SOMEHOW
     clicked: Tab
 
     def _to_tag(self):
@@ -313,8 +316,6 @@ class TabContainer(Partial):
                 )
         _style.add(_ul)
         _tag.add(_style)
-        ###  WE NEED TO APPEND TURBO FRAME
-        # _tag.add(turbo_frame(self.clicked, url=self.clicked.name))
 
 
 # USER CODE

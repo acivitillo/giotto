@@ -1,20 +1,14 @@
-from typing import Optional
+from typing import Any
 
-from fastapi.responses import HTMLResponse
-
-
-# lib templates.py
-from pydantic import BaseModel
-from typing import List, Any
-from dominate.tags import head, body, script, link, div, h1, main
-from dominate.util import raw
 from dominate import document as doc
-from giotto.elements import Select, Button
-from giotto.navigation import TopBar, Sidebar
-from giotto.utils import turbo_frame
+from dominate.tags import body, div, head, link, main, script
+from pydantic import BaseModel
+
+from giotto.navigation import Sidebar, TopBar
 
 
 class AppSite(BaseModel):
+    title: str = "Giotto"
     site_name: str = "Site Name"
     sidebar: Sidebar
     content: Any = div()
@@ -40,6 +34,6 @@ class AppSite(BaseModel):
         return b
 
     def to_html(self):
-        d = doc()
+        d = doc(title=self.title)
         d.add(self.head, self.body)
         return d.render()

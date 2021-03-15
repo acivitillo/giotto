@@ -58,7 +58,7 @@ class JobsTable(BaseView):
         return new_data
 
     def to_tag(self):
-        tag = Table(data=self.data["table"]).to_tag()
+        tag = Table(data=self.data["table"], max_rows=5).to_tag()
         return tag
 
 

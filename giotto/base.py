@@ -1,13 +1,9 @@
-from fastapi.responses import HTMLResponse
-from fastapi import APIRouter
-
 from typing import Any, Dict, Optional
 
 from dominate.tags import div
+from fastapi import APIRouter
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-
-from typing import Any
-from .utils import turbo_frame
 
 router = APIRouter()
 
@@ -18,20 +14,15 @@ def frames():
 
 
 class Frame(BaseModel):
-    name: str
     src: str
 
-    def register_url(self, app: Any, func: any, methods=["get"]):
+    def register_url(self, app: Any, func: Any, methods=["get"]):
         app.add_api_route(self.src, func, methods=methods, response_class=HTMLResponse)
         return True
 
-    def wrap(self, *args):
-        """Wrap component into turbo frame."""
-        return turbo_frame(*args, _id=self.name, src=self.src)
-
 
 class Partial(BaseModel):
-    frame: Optional[Frame] = None
+    kwargs: Dict[str, Any] = {}
 
     @classmethod
     def from_api(cls, url):
@@ -49,10 +40,7 @@ class Partial(BaseModel):
 
     def to_tag(self):
         tag = self._to_tag()
-        if self.frame:
-            return self.frame.wrap(tag)
-        else:
-            return tag
+        return tag
 
     def render(self):
         return self.to_tag().render()
