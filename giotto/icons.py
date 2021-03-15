@@ -87,24 +87,50 @@ class IconSearch(Icon):
         return tag
 
 
+# class IconDetails(Icon):
+#     def _to_tag(self):
+#         tag = svg(
+#             _class="w-5 h-5 m-1 pointer-events-none",
+#             xmlns="http://www.w3.org/2000/svg",
+#             fill="none",
+#             viewBox="0 0 24 24",
+#             stroke="white",
+#         )
+#         _path = path(
+#             stroke_linecap="round",
+#             stroke_linejoin="round",
+#             fill="white",
+#             d="M4 6h16M4 10h16M4 14h16M4 18h16",
+#         )
+#         tag.add(_path)
+#         return tag
+
+
 class IconDetails(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="w-5 h-5 m-1 pointer-events-none",
+            _class="m-auto w-6 h-6 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
             fill="none",
+            stroke="currentColor",
             viewBox="0 0 24 24",
-            stroke="white",
         )
         _path = path(
             stroke_linecap="round",
             stroke_linejoin="round",
-            fill="white",
-            d="M4 6h16M4 10h16M4 14h16M4 18h16",
+            stroke_width="2",
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
         )
         tag.add(_path)
         return tag
 
+# <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+#   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+# </svg>
+
+# <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+#   <path fill-rule="evenodd" d="" clip-rule="" />
+# </svg>
 
 class IconPlay(Icon):
     def _to_tag(self):

@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Optional
-
 from dominate.tags import (
     _input,
     a,
@@ -100,7 +99,7 @@ class Row(Partial):
     contents: List[Partial]
 
     def _to_tag(self):
-        tag = div(_class="flex flex-row")
+        tag = div(_class="flex flex-row item-center justify-center")
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
@@ -128,12 +127,10 @@ class Button(Partial):
     description: str = ""
     icon: Optional[Icon]
     color: str = "blue"
-    name: str = ""
     hx_post: str
     hx_target: str = ""
     hx_confirm: str = ""
     is_flex: bool = False
-    target_frame: str = ""
 
     def _to_tag(self):
         size = "px-5 h-12 "
@@ -158,11 +155,33 @@ class Button(Partial):
         return tag
 
 
+class ClickableIcon(Partial):
+    icon: Icon
+    hx_post: str
+    hx_target: str = ""
+    hx_confirm: str = ""
+
+    def _to_tag(self):
+        actions = ["hx_target", "hx_confirm"]
+        hx_kwargs = {
+            f"data_{action}": self.dict()[action] for action in actions if self.dict().get(action)
+        }
+        tag = div(
+            _class="w-4 mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer",
+            data_hx_post=self.hx_post,
+            data_hx_swap="outerHTML",
+            **hx_kwargs,
+        )
+        tag.add(self.icon.to_tag())
+        return tag
+
+
 class Table(Partial):
     data: List[Dict]
     name: Optional[str]
     description: Optional[str]
     max_rows: int = 1
+    column_width: Dict = {}
 
     def _to_tag(self):
         tag = div(
@@ -183,10 +202,10 @@ class Table(Partial):
             _thr = tr(_class="bg-dark text-white")
             for key in self.data[0].keys():
                 _span = span(key, _title=key)
+                width = self.column_width.get(key)
+                _style = "" if not width else f"width: {width}"
                 _th = th(
-                    _span,
-                    _class="whitespace-nowrap py-2 p-3 h-6 resize-x truncate",
-                    _style="width: 100px",
+                    _span, _class="whitespace-nowrap py-2 resize-x truncate min-w-2", _style=_style
                 )
                 _thr.add(_th)
             _thead.add(_thr)
