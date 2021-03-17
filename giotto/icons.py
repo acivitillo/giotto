@@ -15,13 +15,13 @@ class IconHMenu(Icon):
             viewBox="0 0 24 28",
             stroke="currentColor",
         )
-        _path = path(
+        path_ = path(
             color="white",
             stroke_linecap="round",
             stroke_linejoin="round",
             d="M4 6h16M4 12h16M4 18h16",
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -32,7 +32,7 @@ class IconDownarrow(Icon):
             xmlns="http://www.w3.org/2000/svg",
             viewBox="0 0 412 232",
         )
-        _path = path(
+        path_ = path(
             d=(
                 "M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9"
                 ".763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.3"
@@ -43,7 +43,7 @@ class IconDownarrow(Icon):
             fill="#648299",
             fill_rule="nonzero",
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -52,7 +52,7 @@ class IconFiles(Icon):
         tag = svg(
             _class="h-5 w-5", viewBox="0 0 24 24", fill="none", xmlns="http://www.w3.org/2000/svg"
         )
-        _path = path(
+        path_ = path(
             d=(
                 "M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.10"
                 "46 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 1"
@@ -65,7 +65,7 @@ class IconFiles(Icon):
             stroke_linecap="round",
             stroke_linejoin="round",
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -78,59 +78,33 @@ class IconSearch(Icon):
             viewBox="0 0 24 24",
             stroke="currentColor",
         )
-        _path = path(
+        path_ = path(
             strokeLinecap="round",
             strokeLinejoin="round",
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
-
-
-# class IconDetails(Icon):
-#     def _to_tag(self):
-#         tag = svg(
-#             _class="w-5 h-5 m-1 pointer-events-none",
-#             xmlns="http://www.w3.org/2000/svg",
-#             fill="none",
-#             viewBox="0 0 24 24",
-#             stroke="white",
-#         )
-#         _path = path(
-#             stroke_linecap="round",
-#             stroke_linejoin="round",
-#             fill="white",
-#             d="M4 6h16M4 10h16M4 14h16M4 18h16",
-#         )
-#         tag.add(_path)
-#         return tag
 
 
 class IconDetails(Icon):
     def _to_tag(self):
         tag = svg(
-            _class="m-auto w-6 h-6 pointer-events-none",
+            _class="m-auto w-6 h-6",
             xmlns="http://www.w3.org/2000/svg",
             fill="none",
             stroke="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(
+        path_ = path(
             stroke_linecap="round",
             stroke_linejoin="round",
             stroke_width="2",
             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
-# <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-#   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-# </svg>
-
-# <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-#   <path fill-rule="evenodd" d="" clip-rule="" />
-# </svg>
 
 class IconPlay(Icon):
     def _to_tag(self):
@@ -140,7 +114,7 @@ class IconPlay(Icon):
             fill="currentColor",
             viewBox="0 0 20 20",
         )
-        _path = path(
+        path_ = path(
             fill_rule="evenodd",
             clip_rule="evenodd",
             d=(
@@ -148,7 +122,7 @@ class IconPlay(Icon):
                 "1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -160,7 +134,7 @@ class IconStop(Icon):
             fill="currentColor",
             viewBox="0 0 20 20",
         )
-        _path = path(
+        path_ = path(
             fill_rule="evenodd",
             clip_rule="evenodd",
             d=(
@@ -168,7 +142,7 @@ class IconStop(Icon):
                 " 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -180,7 +154,7 @@ class IconBin(Icon):
             fill="currentColor",
             viewBox="0 0 20 20",
         )
-        _path = path(
+        path_ = path(
             fill_rule="evenodd",
             clip_rule="evenodd",
             d=(
@@ -190,7 +164,7 @@ class IconBin(Icon):
                 "0V8a1 1 0 00-1-1z"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -202,7 +176,7 @@ class IconFirstPage(Icon):
             fill="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(
+        path_ = path(
             d=(
                 "M17.7 15.89L13.82 12l3.89-3.89c.39-.39.39-1.02 0-1.41-.39-.39-"
                 "1.02-.39-1.41 0l-4.59 4.59c-.39.39-.39 1.02 0 1.41l4.59 4.59c."
@@ -210,7 +184,7 @@ class IconFirstPage(Icon):
                 "1 1v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1z"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -222,14 +196,14 @@ class IconPreviousPage(Icon):
             fill="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(
+        path_ = path(
             d=(
                 "M14.71 6.71c-.39-.39-1.02-.39-1.41 0L8.71 11.3c-.39.39-.39 1.0"
                 "2 0 1.41l4.59 4.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.4"
                 "1L10.83 12l3.88-3.88c.39-.39.38-1.03 0-1.41z"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -241,14 +215,14 @@ class IconNextPage(Icon):
             fill="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(
+        path_ = path(
             d=(
                 "M9.29 6.71c-.39.39-.39 1.02 0 1.41L13.17 12l-3.88 3.88c-.39.39"
                 "-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l4.59-4.59c.39-.39.39-1.0"
                 "2 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01z"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -260,7 +234,7 @@ class IconLastPage(Icon):
             fill="currentColor",
             viewBox="0 0 24 24",
         )
-        _path = path(
+        path_ = path(
             d=(
                 "M6.29 8.11L10.18 12l-3.89 3.89c-.39.39-.39 1.02 0 1.41.39.39 1"
                 ".02.39 1.41 0l4.59-4.59c.39-.39.39-1.02 0-1.41L7.7 6.7c-.39-.3"
@@ -268,7 +242,7 @@ class IconLastPage(Icon):
                 "v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1z"
             )
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
 
 
@@ -281,7 +255,7 @@ class IconRefresh(Icon):
             viewBox="0 0 24 24",
             stroke="currentColor",
         )
-        _path = path(
+        path_ = path(
             stroke_linecap="round",
             stroke_linejoin="round",
             stroke_width="2",
@@ -290,5 +264,5 @@ class IconRefresh(Icon):
                 "581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             ),
         )
-        tag.add(_path)
+        tag.add(path_)
         return tag
