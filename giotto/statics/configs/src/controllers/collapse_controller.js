@@ -21,5 +21,10 @@ export default class extends Controller {
                 element.classList.add("hidden")
             }
         });
+        var el = document.getElementsByClassName("selected")
+        if (el[0] != undefined) {
+            el[0].classList.add("hidden")
+            el[0].classList.remove("selected")
+        }
     };
 }
