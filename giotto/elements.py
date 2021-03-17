@@ -67,7 +67,6 @@ class Input(Partial):
                 " hover:border-gray-400 focus:outline-none appearance-none mt-1"
             ),
             placeholder=self.placeholder,
-            **self.kwargs,
         )
         tag.add(input_)
         tag.add(self.icon.to_tag())
@@ -88,7 +87,7 @@ class Row(Partial):
     contents: List[Partial]
 
     def _to_tag(self):
-        tag = div(_class="flex flex-row item-center justify-center")
+        tag = div(_class="flex flex-row")
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
@@ -104,21 +103,10 @@ class Column(Partial):
         return tag
 
 
-class TableAction(Partial):
-    description: str
-
-    def _to_tag(self):
-        tag = a(self.description, href="#", _class="text-blue-400 hover:text-blue-600 underline")
-        return tag
-
-
 class Button(Partial):
     description: str = ""
     icon: Optional[Icon]
     color: str = "blue"
-    hx_post: str
-    hx_target: str = ""
-    hx_confirm: str = ""
     is_flex: bool = False
 
     def _to_tag(self):
@@ -131,13 +119,7 @@ class Button(Partial):
             f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
             f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
         )
-        actions = ["hx_target", "hx_confirm"]
-        hx_kwargs = {
-            f"data_{action}": self.dict()[action] for action in actions if self.dict().get(action)
-        }
-        tag = button(
-            _class=_class, data_hx_post=self.hx_post, data_hx_swap="outerHTML", **hx_kwargs
-        )
+        tag = button(_class=_class)
         if self.icon:
             tag.add(self.icon.to_tag())
         tag.add(span(self.description))
@@ -146,20 +128,10 @@ class Button(Partial):
 
 class ClickableIcon(Partial):
     icon: Icon
-    hx_post: str
-    hx_target: str = ""
-    hx_confirm: str = ""
 
     def _to_tag(self):
-        actions = ["hx_target", "hx_confirm"]
-        hx_kwargs = {
-            f"data_{action}": self.dict()[action] for action in actions if self.dict().get(action)
-        }
         tag = div(
             _class="w-4 mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer",
-            data_hx_post=self.hx_post,
-            data_hx_swap="outerHTML",
-            **hx_kwargs,
         )
         tag.add(self.icon.to_tag())
         return tag
@@ -188,12 +160,19 @@ class Table(Partial):
 
     @property
     def filters(self):
-        div_ = div(_class="relative inline-flex mb-3 p-2")
-        input_ = Input(
+        div_ = div(_class="relative inline-flex")
+        input_ = _input(
+            type="search",
+            _class=(
+                "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
+                " hover:border-gray-400 focus:outline-none appearance-none mt-1"
+            ),
             placeholder="Search",
-            kwargs=dict(data_action="input->table#filter", data_table_target="input"),
-        ).to_tag()
+            data_action="input->table#filter",
+            data_table_target="input",
+        )
         div_.add(input_)
+        div_.add(IconSearch().to_tag())
         return div_
 
     @property
@@ -224,7 +203,7 @@ class Table(Partial):
             )
             for value in row.values():
                 if isinstance(value, Partial):
-                    _td = td(_class="text-center p-2 border-0")
+                    _td = td(_class="flex item-center justify-center p-2 border-0")
                     _td.add(value.to_tag())
                 else:
                     _span = span(str(value), _title=str(value))
@@ -266,7 +245,11 @@ class Table(Partial):
             last_button,
             _class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
         )
-        _div = div(desc, buttons, _class="flex justify-between items-center sm:px-2 sm:py-2",)
+        _div = div(
+            desc,
+            buttons,
+            _class="flex justify-between items-center sm:px-2 sm:py-2",
+        )
         return _div
 
 

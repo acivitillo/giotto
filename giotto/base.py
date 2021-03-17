@@ -1,33 +1,32 @@
 from typing import Any, Dict, Optional
 
 from dominate.tags import div
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-router = APIRouter()
 
+class Action(BaseModel):
+    url: Optional[str] = None
+    trigger: Optional[str] = None
+    target: Optional[str] = None
+    confirm: Optional[str] = None
 
-@router.get("/frames", response_class=HTMLResponse)
-def frames():
-    return "hello"
-
-
-class Frame(BaseModel):
-    src: str
-
-    def register_url(self, app: Any, func: Any, methods=["get"]):
-        app.add_api_route(self.src, func, methods=methods, response_class=HTMLResponse)
-        return True
+    @property
+    def hx_kwargs(self):
+        kwargs = {
+            "data-hx-post": self.url,
+            "data-hx-trigger": self.trigger,
+            "data-hx-target": self.target,
+            "data-hx-confirm": self.confirm,
+            "data-hx-swap": "outerHTML",
+        }
+        return {key: value for key, value in kwargs.items() if value is not None}
 
 
 class Partial(BaseModel):
-    kwargs: Dict[str, Any] = {}
+    action: Optional[Action] = None
 
     @classmethod
     def from_api(cls, url):
-        # data = from_api()
-        # return cls(**data)
         pass
 
     @classmethod
@@ -40,6 +39,8 @@ class Partial(BaseModel):
 
     def to_tag(self):
         tag = self._to_tag()
+        if self.action:
+            tag.attributes.update(self.action.hx_kwargs)
         return tag
 
     def render(self):

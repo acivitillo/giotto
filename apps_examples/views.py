@@ -4,7 +4,8 @@ from typing import Any, Dict, List
 from dominate.tags import div
 from pydantic import BaseModel
 
-from giotto.elements import Box, Button, Table, Text
+from giotto.base import Action
+from giotto.elements import Box, Button, Table, Text, ClickableIcon, Row
 from giotto.icons import IconBin, IconDetails, IconPlay, IconRefresh, IconStop
 
 
@@ -38,17 +39,10 @@ class JobsTable(BaseView):
         new_data = []
         for row in data:
             new_row = dict()
-            name = row["name"] + "_details"
             job_name = row["name"]
-            new_row["Action"] = Button(
-                description="",
-                color="blue",
-                name=name,
-                icon=IconDetails(),
-                is_flex=True,
-                hx_post=f"/{url_prefix}/jobruns/{job_name}",
-                hx_target="#jobs_table",
-            )
+            action = Action(url=f"/{url_prefix}/jobruns/{job_name}", target="#jobs_table")
+            new_row["Action"] = ClickableIcon(icon=IconDetails(), action=action)
+
             for key, value in row.items():
                 new_key = key.replace("_", " ").title()
                 new_row[new_key] = value
@@ -87,29 +81,33 @@ class JobRunsTable(BaseView):
             record = data[0]
             record["status"] = self.jobrun_status
             data.append(record)
+
         run_btn = Button(
             description="Run",
             color="green",
             icon=IconPlay(),
-            hx_post=f"/{url_prefix}/jobs/{job_name}/run",
-            hx_target="#jobs_table",
+            action=Action(url=f"/{url_prefix}/jobs/{job_name}/run", target="#jobs_table"),
         )
+
         stop_btn = Button(
-            description="Stop", color="red", icon=IconStop(), hx_post="/tbd", hx_target="tbd"
+            description="Stop",
+            color="red",
+            icon=IconStop(),
+            action=Action(url="/tbd", target="#tbd"),
         )
+
         unregister_btn = Button(
             description="Unregister",
             color="purple",
             icon=IconBin(),
-            hx_post="/tbd",
-            hx_target="tbd",
+            action=Action(url="/tbd", target="#tbd"),
         )
+
         refresh_btn = Button(
             description="Refresh",
             color="purple",
             icon=IconRefresh(),
-            hx_post=f"/{url_prefix}/jobruns/{job_name}/refresh",
-            hx_target="#jobs_table",
+            action=Action(url=f"/{url_prefix}/jobruns/{job_name}/refresh", target="#jobs_table"),
         )
         table_jobruns = Table(data=data, max_rows=5).to_tag()
         box = Box(contents=[title, run_btn, stop_btn, unregister_btn, refresh_btn]).to_tag()
