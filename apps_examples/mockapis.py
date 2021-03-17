@@ -6,14 +6,15 @@ sidebar_items = [
         "text": "Documentation",
         "href": "#",
         "subheaders": [
-            {"text": "Giotto Readme", "href": "/ghpage?path=README.md"},
+            {"text": "Giotto Readme", "href": "/ghpage?path=README.md&selected=Giotto Readme"},
+            {"text": "Example link", "href": "#"},
         ],
     },
     {
         "text": "ACOE",
         "href": "#",
         "subheaders": [
-            {"text": "Scheduler", "href": "/scheduler"},
+            {"text": "Scheduler", "href": "/scheduler?selected=Scheduler"},
         ],
     },
 ]

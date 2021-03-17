@@ -37,8 +37,13 @@ def get_readme(owner: str, repo: str, path: str, proxy_url: str = "", token: str
 
 
 @router.get("/", response_class=HTMLResponse)
-def index(path: str):
-    site = AppSite(sidebar=Sidebar(items=mockapis.sidebar_items))
+def index(path: str, selected: str = ""):
+    site = AppSite(
+        sidebar=Sidebar(
+            items=mockapis.sidebar_items,
+            selected={"lev1": "Documentation", "lev2": "Giotto Readme"},
+        )
+    )
     readme_md = get_readme(owner="acivitillo", repo="giotto", proxy_url=proxy_url, path=path)
     text = Box(contents=[Text(value=readme_md)], centered=True).to_tag()
     site.content = div(text)

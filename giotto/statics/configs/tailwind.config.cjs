@@ -1,5 +1,6 @@
 const colors = require('tailwindcss/colors')
 const tailwindcss = require('tailwindcss');
+const plugin = require('tailwindcss/plugin')
 
 module.exports = {
     theme: {
@@ -21,5 +22,14 @@ module.exports = {
         tailwindcss('./tailwind.config.cjs'),
         require('autoprefixer'),
         require('@tailwindcss/typography'),
+        plugin(function ({ addUtilities }) {
+            const newUtilities = {
+                '.selected': {
+                    "background-color": '#e98300',
+                }
+            }
+
+            addUtilities(newUtilities)
+        }),
     ],
 };
