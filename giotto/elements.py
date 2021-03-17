@@ -259,14 +259,11 @@ class Table(Partial):
 
 class Text(Partial):
     value: str
-    size: str = "base"
-    weight: str = "normal"
-    color: str = "black"
 
     def _to_tag(self):
         tag = div(
             raw(markdown(self.value, extensions=["fenced_code"])),
-            _class=f"prose max-w-none",
+            _class="prose max-w-none",
         )
         return tag
 

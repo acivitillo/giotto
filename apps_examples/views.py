@@ -76,7 +76,7 @@ class JobRunsTable(BaseView):
         data = self.data["table"]
         url_prefix = self.url_prefix
         job_name = self.job_name
-        title = Text(value=job_name, size="4xl", weight="bold")
+        title = Text(value=f"## {self.job_name}")
         if self.jobrun_status != "":  # mock "running" case
             record = data[0]
             record["status"] = self.jobrun_status

@@ -3,6 +3,7 @@ import json
 from dominate.tags import div
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
+import os
 
 from giotto.navigation import Sidebar
 from giotto.templates import AppSite
@@ -12,6 +13,8 @@ from . import mockapis
 from .views import JobRunsTable, JobsTable
 from .local_configs import proxy_url
 
+
+proxy_url = proxy_url or os.getenv("HTTP_PROXY", "")
 prefix = "ghpage"
 router = APIRouter(prefix=f"/{prefix}")
 
