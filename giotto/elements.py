@@ -75,9 +75,13 @@ class Input(Partial):
 
 class Box(Partial):
     contents: List[Partial]
+    centered: bool = False
 
     def _to_tag(self):
-        tag = div(_class="container")
+        style = "container"
+        if self.centered:
+            style += " mx-auto w-full 2xl:w-1/2"
+        tag = div(_class=style)
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
@@ -261,8 +265,8 @@ class Text(Partial):
 
     def _to_tag(self):
         tag = div(
-            raw(markdown(self.value)),
-            _class=f"text-{self.size} font-{self.weight} text-{self.color} m-1",
+            raw(markdown(self.value, extensions=["fenced_code"])),
+            _class=f"prose max-w-none",
         )
         return tag
 

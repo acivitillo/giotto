@@ -27,7 +27,7 @@ class AppSite(BaseModel):
         topbar = TopBar(value=self.site_name).to_tag()
         b.add(topbar)
         container = div(_class="flex")
-        m = main(_class="p-8 overflow-x-auto")
+        m = main(_class="p-8 overflow-x-auto flex-1")
         m.add(self.content)
         container.add(self.sidebar.to_tag(), m)
         b.add(container)

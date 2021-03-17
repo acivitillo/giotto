@@ -1,10 +1,23 @@
-# Running the main application
+# Running the examples
+
+Add configs:
+
+```bash
+vim app_examples/local_config.py
+# Supported Variables
+proxy_url = ...
+```
+
+To run the Server:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Visit `http://127.0.0.1:8000/testapp`.
+Examples running on these urls:
+
+* http://127.0.0.1:8000/scheduler
+* http://127.0.0.1:8000/ghpage
 
 # Setup webpack
 
