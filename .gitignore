@@ -133,3 +133,6 @@ dmypy.json
 node_modules
 assets/package-lock.json
 assets/package.json
+
+#Company
+local_configs.py

@@ -31,5 +31,8 @@
     "webpack-helpers": "0.0.1"
   },
   "keywords": [],
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/typography": "^0.4.0"
+  }
 }

@@ -63,7 +63,7 @@ class Sidebar(BaseModel):
                 for subitem in item["subheaders"]:
                     lev2 = a(
                         _class="flex w-44 items-center py-2 pl-10 text-white bg-cgrey_200 hidden hover:text-dark border-t-2",
-                        href="#",
+                        href=subitem["href"],
                         data_collapse_target="leveltwo",
                     )
                     _span = span(subitem["text"], _class="mx-4")
