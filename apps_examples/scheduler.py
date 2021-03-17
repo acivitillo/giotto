@@ -13,7 +13,7 @@ router = APIRouter(prefix=f"/{prefix}")
 
 @router.get("/", response_class=HTMLResponse)
 def index():
-    site = AppSite(sidebar=Sidebar(items=mockapis.sidebar_items))
+    site = AppSite(sidebar=Sidebar(items=mockapis.sidebar_items, selected="Scheduler"))
     table_jobs = JobsTable.from_dict(prefix, mockapis.jobs["data"]).to_tag()
     site.content = div(table_jobs, div(_id="jobs_table"))
     return site.to_html()

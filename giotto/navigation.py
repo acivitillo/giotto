@@ -40,6 +40,7 @@ class TopBar(BaseModel):
 
 class Sidebar(BaseModel):
     items: List
+    selected: dict = {}
 
     def to_tag(self):
         tag = aside(_class="hidden md:flex bg-dark w-44 h-screen pt-5 sm:mt-0")
@@ -61,8 +62,14 @@ class Sidebar(BaseModel):
             lev1.add(icon, _span)
             if "subheaders" in item:
                 for subitem in item["subheaders"]:
+                    style = "flex w-44 items-center py-2 pl-10 text-white bg-cgrey_200 hover:text-dark border-t-2"
+                    if item["text"] == self.selected["lev1"]:
+                        if subitem["text"] == self.selected["lev2"]:
+                            style += " selected"
+                    else:
+                        style += " hidden"
                     lev2 = a(
-                        _class="flex w-44 items-center py-2 pl-10 text-white bg-cgrey_200 hidden hover:text-dark border-t-2",
+                        _class=style,
                         href=subitem["href"],
                         data_collapse_target="leveltwo",
                     )
