@@ -63,8 +63,8 @@ class Sidebar(BaseModel):
             if "subheaders" in item:
                 for subitem in item["subheaders"]:
                     style = "flex w-44 items-center py-2 pl-10 text-white bg-cgrey_200 hover:text-dark border-t-2"
-                    if item["text"] == self.selected["lev1"]:
-                        if subitem["text"] == self.selected["lev2"]:
+                    if item["text"] == self.selected.get("lev1"):
+                        if subitem["text"] == self.selected.get("lev2"):
                             style += " selected"
                     else:
                         style += " hidden"
