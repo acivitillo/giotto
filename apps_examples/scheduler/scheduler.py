@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 
 from giotto.navigation import Sidebar
 from giotto.templates import AppSite
-from . import mockapis
+from .. import mockapis
 from .views import JobRunsTable, JobsTable
 
 prefix = "scheduler"

@@ -10,7 +10,6 @@ from giotto.templates import AppSite
 from giotto.elements import Text, Box
 
 from . import mockapis
-from .views import JobRunsTable, JobsTable
 from .local_configs import proxy_url
 
 
