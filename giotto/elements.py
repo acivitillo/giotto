@@ -36,21 +36,20 @@ from .icons import (
 
 class Select(Partial):
     options: List[str]
-    icon: Icon = IconDownarrow()
+    selected: str = ""
 
     def _to_tag(self):
-        tag = div(_class="relative inline-flex")
-        _svg = self.icon.to_tag()
-        tag.add(_svg)
         _class = (
             "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none appearance-none mt-1"
+            " hover:border-gray-400 focus:outline-none mt-1"
         )
         _select = select(_class=_class)
+        _select.add(option(_class="hidden"))
         for text in self.options:
-            _select.add(option(text))
-        tag.add(_select)
-        return tag
+            option_ = option(text, selected="selected") if text == self.selected else option(text)
+            _select.add(option_)
+
+        return _select
 
 
 class Input(Partial):
