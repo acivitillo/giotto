@@ -15,6 +15,7 @@ sidebar_items = [
         "href": "#",
         "subheaders": [
             {"text": "Scheduler", "href": "/scheduler?selected=Scheduler"},
+            {"text": "Crosstab", "href": "/crosstab?selected=Crosstab"},
         ],
     },
 ]
@@ -162,3 +163,13 @@ jobruns = {"data": []}
 
 for job_name, data in jobruns_raw.items():
     jobruns["data"].extend(data["data"])
+
+
+sources = {
+    "redshift": {
+        "music": ["track", "artist"],
+        "mathematics": ["squares", "integrals"],
+        "cities": ["london"],
+    },
+    "aurora": {"music": ["track", "artist"], "dance": ["rumba", "tango", "salsa"]},
+}

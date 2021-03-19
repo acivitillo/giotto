@@ -6,8 +6,9 @@ from giotto.templates import AppSite
 from giotto.elements import Text, Box
 from giotto.navigation import Sidebar
 
-from apps_examples.scheduler import router as example_scheduler
+from apps_examples.scheduler.scheduler import router as example_scheduler
 from apps_examples.ghpages import router as ghpages
+from apps_examples.connected_dropdowns.main import router as connected_dropdowns
 from apps_examples import mockapis
 
 app = FastAPI()
@@ -26,3 +27,4 @@ app.mount("/giotto-statics", StaticFiles(packages=["giotto"]))
 
 app.include_router(example_scheduler)
 app.include_router(ghpages)
+app.include_router(connected_dropdowns)
