@@ -54,22 +54,22 @@ class Select(Partial):
 
 class Input(Partial):
     placeholder: str = "Search by name..."
+    value: str = ""
     icon: Icon = IconSearch()
 
     def _to_tag(self):
 
-        tag = div(_class="relative inline-flex")
         input_ = _input(
-            type="search",
+            type="text",
             _class=(
                 "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-                " hover:border-gray-400 focus:outline-none appearance-none mt-1"
+                " hover:border-gray-400 focus:outline-none mt-1"
             ),
             placeholder=self.placeholder,
         )
-        tag.add(input_)
-        tag.add(self.icon.to_tag())
-        return tag
+        if self.value:
+            input_.attributes["value"] = self.value
+        return input_
 
 
 class Box(Partial):
@@ -111,9 +111,10 @@ class Button(Partial):
     icon: Optional[Icon]
     color: str = "blue"
     is_flex: bool = False
+    height: int = 12
 
     def _to_tag(self):
-        size = "px-5 h-12 "
+        size = f"px-5 h-{self.height} "
         if self.is_flex:
             size = ""
         _class = (
@@ -142,7 +143,6 @@ class ClickableIcon(Partial):
 
 class Table(Partial):
     data: List[Dict]
-    name: Optional[str]
     description: Optional[str]
     max_rows: int = 1
     column_width: Dict = {}
