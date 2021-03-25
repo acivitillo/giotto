@@ -41,12 +41,31 @@ class Select(Partial):
     def _to_tag(self):
         _class = (
             "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none mt-1"
+            " hover:border-gray-400 focus:outline-none"
         )
         _select = select(_class=_class)
         _select.add(option(_class="hidden"))
         for text in self.options:
             option_ = option(text, selected="selected") if text == self.selected else option(text)
+            _select.add(option_)
+        return _select
+
+
+class MultiSelect(Partial):
+    options: List[str]
+    selected: List[str] = []
+
+    def _to_tag(self):
+        _class = (
+            "border border-gray-300 text-gray-600 h-20 pl-5 w-56 bg-white"
+            " hover:border-gray-400 focus:outline-none"
+        )
+        _select = select(_class=_class, multiple="multiple")
+        _select.add(option(_class="hidden"))
+        for text in self.options:
+            option_ = option(text)
+            if text in self.selected:
+                option_.attributes["selected"] = "selected"
             _select.add(option_)
 
         return _select

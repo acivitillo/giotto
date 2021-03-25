@@ -167,9 +167,12 @@ for job_name, data in jobruns_raw.items():
 
 sources = {
     "redshift": {
-        "music": ["track", "artist"],
-        "mathematics": ["squares", "integrals"],
-        "cities": ["london"],
+        "music": {"track": [], "artist": []},
+        "mathematics": {"squares": [], "integrals": []},
+        "cities": {"london": ["street", "building", "price"]},
     },
-    "aurora": {"music": ["track", "artist"], "dance": ["rumba", "tango", "salsa"]},
+    "aurora": {
+        "music": {"track": [], "artist": []},
+        "dance": {"rumba": ["move", "time"], "tango": ["move", "time"], "salsa": ["move", "time"]},
+    },
 }
