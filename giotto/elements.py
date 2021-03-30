@@ -18,6 +18,7 @@ from dominate.tags import (
     thead,
     tr,
     ul,
+    label,
 )
 from dominate.util import raw
 from markdown import markdown
@@ -32,6 +33,7 @@ from .icons import (
     IconPreviousPage,
     IconSearch,
 )
+from pydantic import validator
 
 
 class Select(Partial):
@@ -39,16 +41,18 @@ class Select(Partial):
     selected: str = ""
 
     def _to_tag(self):
-        _class = (
+        class_ = (
             "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none"
+            " hover:border-gray-400 focus:outline-none m-2"
         )
-        _select = select(_class=_class)
-        _select.add(option(_class="hidden"))
+        tag = select(_class=class_)
+        tag.add(option("", value=""))
         for text in self.options:
-            option_ = option(text, selected="selected") if text == self.selected else option(text)
-            _select.add(option_)
-        return _select
+            option_ = option(text)
+            if text == self.selected:
+                option_.attributes["selected"] = "selected"
+            tag.add(option_)
+        return tag
 
 
 class MultiSelect(Partial):
@@ -56,39 +60,34 @@ class MultiSelect(Partial):
     selected: List[str] = []
 
     def _to_tag(self):
-        _class = (
+        class_ = (
             "border border-gray-300 text-gray-600 h-20 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none"
+            " hover:border-gray-400 focus:outline-none m-2"
         )
-        _select = select(_class=_class, multiple="multiple")
-        _select.add(option(_class="hidden"))
+        tag = select(_class=class_, multiple="multiple")
+        tag.add(option(_class="hidden"))
         for text in self.options:
             option_ = option(text)
             if text in self.selected:
                 option_.attributes["selected"] = "selected"
-            _select.add(option_)
-
-        return _select
+            tag.add(option_)
+        return tag
 
 
 class Input(Partial):
     placeholder: str = "Search by name..."
     value: str = ""
-    icon: Icon = IconSearch()
+    type_: str = "text"
 
     def _to_tag(self):
-
-        input_ = _input(
-            type="text",
-            _class=(
-                "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-                " hover:border-gray-400 focus:outline-none mt-1"
-            ),
-            placeholder=self.placeholder,
+        class_ = (
+            "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
+            " hover:border-gray-400 focus:outline-none m-2"
         )
+        tag = _input(type=self.type_, _class=class_, placeholder=self.placeholder)
         if self.value:
-            input_.attributes["value"] = self.value
-        return input_
+            tag.attributes["value"] = self.value
+        return tag
 
 
 class Box(Partial):

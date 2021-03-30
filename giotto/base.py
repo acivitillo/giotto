@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional
 
-from dominate.tags import div
+from dominate.tags import div, label
 from pydantic import BaseModel
 
 
@@ -28,6 +28,7 @@ class Partial(BaseModel):
     id_: Optional[str] = None
     name: Optional[str] = None
     action: Optional[Action] = None
+    label: str = ""
 
     @classmethod
     def from_api(cls, url):
@@ -49,6 +50,8 @@ class Partial(BaseModel):
             tag.attributes.update({"name": self.name})
         if self.action:
             tag.attributes.update(self.action.hx_kwargs)
+        if self.label:
+            tag = label(self.label, tag, _class="ml-2")
         return tag
 
     def render(self):
