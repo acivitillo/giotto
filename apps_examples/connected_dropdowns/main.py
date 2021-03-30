@@ -1,14 +1,13 @@
 import os
-from typing import List
 
 from dominate.tags import div
 from fastapi import APIRouter, Form
 from fastapi.responses import HTMLResponse
 
-from giotto.elements import Input, MultiSelect, Select, Button
+from giotto.elements import Text
 from giotto.navigation import Sidebar
 from giotto.templates import AppSite
-from giotto.views import FiltersView
+from giotto.views import NewFiltersView
 
 from .. import mockapis
 
@@ -26,45 +25,9 @@ def index():
             items=mockapis.sidebar_items, selected={"lev1": "ACOE", "lev2": "Crosstab"}
         ),
     )
-    dropdowns = generate_filters()
+    dropdowns = generate_filters(source="", schema="", table="", column="")
     site.content = div(dropdowns)
     return site.to_html()
-
-
-def generate_filters(
-    source: str = "",
-    schema: str = "",
-    table: str = "",
-    message: str = "",
-    dimensions: List[str] = [],
-    measures: List[str] = [],
-):
-    sources = get_sources()
-    schemas = [] if not source else get_schemas(source=source)
-    tables = [] if not schemas else get_tables(source=source, schema=schema)
-    all_columns = [] if not tables else get_columns(source=source, schema=schema, table=table)
-
-    # Cleaning old cached arguments
-    schema = schema if schema in schemas else ""
-    table = table if table in tables else ""
-    dimensions = dimensions if set(dimensions).issubset(set(all_columns)) else []
-    measures = measures if set(measures).issubset(set(all_columns)) else []
-
-    filters = {
-        "source": Select(options=sources, selected=source),
-        "schema": Select(options=schemas, selected=schema),
-        "table": Select(options=tables, selected=table),
-        "dimensions": MultiSelect(options=all_columns, selected=dimensions),
-        "measures": MultiSelect(options=all_columns, selected=measures),
-        "message": Input(placeholder="Add your message", value=message),
-        "generate": Button(description="Submit"),
-    }
-
-    view = FiltersView(data=filters, url_prefix=f"{prefix}/dropdowns").to_tag()
-    view.add(div(f"input: {source} {schema} {table} {dimensions} {measures} {message}"))
-    if dimensions and measures:
-        view.add(div("Hurray !!! I'm able to produce a table now :D"))
-    return view
 
 
 @router.post("/dropdowns", response_class=HTMLResponse, tags=["Crosstab"])
@@ -72,25 +35,18 @@ def select_table(
     source: str = Form(""),
     schema: str = Form(""),
     table: str = Form(""),
-    message: str = Form(""),
-    dimensions: List[str] = Form([]),
-    measures: List[str] = Form([]),
+    column: str = Form(""),
 ):
-    f = generate_filters(source, schema, table, message, dimensions, measures)
+    f = generate_filters(source=source, schema=schema, table=table, column=column)
     return f.render()
 
 
-def get_sources():
-    return list(mockapis.sources.keys())
+def get_data():
+    return mockapis.sources
 
 
-def get_schemas(source: str):
-    return list(mockapis.sources.get(source, {}).keys())
-
-
-def get_tables(source: str, schema: str):
-    return list(mockapis.sources.get(source, {}).get(schema, {}).keys())
-
-
-def get_columns(source: str, schema: str, table: str):
-    return mockapis.sources.get(source, {}).get(schema, {}).get(table, [])
+def generate_filters(**user_input):
+    data = get_data()
+    view = NewFiltersView(data=data, filters=user_input, url_prefix=f"{prefix}/dropdowns").to_tag()
+    text = Text(value=f"input: {list(user_input.values())}").to_tag()
+    return div(view, text)
