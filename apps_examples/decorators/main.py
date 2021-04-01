@@ -9,11 +9,16 @@ webapp = App(app=app)
 webapp.register()
 
 
-@webapp.input(frame_name="filters", target="dd_tables")
-def dd_tables(dd_tables: str = "", dd_fruits: str = "", independents: str = ""):
+@webapp.input(
+    frame_name="inp_cascading_selects",
+    target="inp_cascading_selects",
+    out_target="out_cascading_selects",
+)
+def inp_cascading_selects(dd_tables: str = "", dd_fruits: str = "", independents: str = ""):
     options = ["agrumi", "vegetables", "nuts"]
     fruits = []
     independent = ["movies", "books", "etc"]
+    sel1 = Select.from_list("dd_tables", options)
     if dd_tables != "":
         fruits = {
             "agrumi": ["oranges", "lemons"],
@@ -21,25 +26,26 @@ def dd_tables(dd_tables: str = "", dd_fruits: str = "", independents: str = ""):
             "nuts": ["walnuts", "whatever"],
         }
         fruits = fruits[dd_tables]
-    sel1 = Select.from_list("dd_tables", options).to_tag()
-    sel2 = Select.from_list("dd_fruits", fruits).to_tag()
-    sel3 = Select.from_list("independents", independent).to_tag()
-    msg = ""
+        sel1.selected = dd_tables
+    sel1 = sel1.to_tag()
+    sel2 = Select.from_list("dd_fruits", fruits)
+    if dd_fruits != "":
+        sel2.selected = dd_fruits
+    sel2 = sel2.to_tag()
+    sel3 = Select.from_list("independents", independent)
     if independents != "":
-        msg = p(
-            f"state is dd_tables={dd_tables}, dd_fruits={dd_fruits}, independents={independents}"
-        )
-    btn = button("Submit", data_hx_post="/receiver?func_name=message", data_hx_target="#message")
-    return div(sel1, sel2, sel3, msg, btn)
+        sel3.selected = independents
+    sel3 = sel3.to_tag()
+    return [sel1, sel2, sel3]
 
 
-@webapp.output(frame_name="message")
-def message(dd_tables: str = "", dd_fruits: str = "", independents: str = ""):
+@webapp.output(frame_name="out_cascading_selects")
+def out_cascading_selects(dd_tables: str = "", dd_fruits: str = "", independents: str = ""):
     _ul = ul()
     _ul.add(li(p(f"You selected table: {dd_tables}")))
     _ul.add(li(p(f"You selected fruit: {dd_fruits}")))
     _ul.add(li(p(f"You selected independent: {independents}")))
-    return _ul
+    return [_ul]
 
 
 @webapp.input(frame_name="addtwo", target="out_addtwo")
@@ -48,10 +54,10 @@ def dd_values():
     vals2 = [1, 2, 3]
     sel1 = Select.from_list("vals1", vals1).to_tag()
     sel2 = Select.from_list("vals2", vals2).to_tag()
-    return div(sel1, sel2)
+    return [sel1, sel2]
 
 
 @webapp.output(frame_name="out_addtwo")
 def out_addtwo(vals1: int = 0, vals2: int = 0):
     s = int(vals1) + int(vals2)
-    return p(f"The sum of your selected values is {s}")
+    return [p(f"The sum of your selected values is {s}")]
