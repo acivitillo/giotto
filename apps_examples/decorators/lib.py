@@ -3,7 +3,7 @@ from fastapi import Form, Request
 from fastapi.responses import HTMLResponse
 from typing import List, Dict, Any
 from dominate import tags
-from dominate.tags import h1, select, option, div, body, head, script, form
+from dominate.tags import h1, select, option, div, body, head, script, form, button
 from dominate import document
 from pydantic import BaseModel
 from functools import wraps
@@ -39,11 +39,16 @@ class App(BaseModel):
             self.frames[name]["tags"].append(tag)
         return self
 
-    def append_function(self, func, target=""):
+    def append_function(self, func, route: str = "", target=""):
         func_name = func.__name__
         arguments = [arg for arg in inspect.signature(func).parameters]
         print(arguments)
-        self.functions[func_name] = {"func": func, "target": target, "args": arguments}
+        self.functions[func_name] = {
+            "route": route,
+            "func": func,
+            "target": target,
+            "args": arguments,
+        }
         return self
 
     async def receiver(self, request: Request, func_name: str):
@@ -52,18 +57,21 @@ class App(BaseModel):
         def to_tag():
             func = self.functions[func_name]["func"]
             args = self.functions[func_name]["args"]
+            route = self.functions[func_name]["route"]
+            target = self.functions[func_name]["target"]
             func_args = []
-            print(form)
             for arg in args:
                 try:
                     func_args.append(form[arg])
                 except KeyError:
                     raise KeyError(f"Value {arg} in function {func_name} not in form data")
-            result = func(*func_args)
-            return result
+            tags = func(*func_args)
+            out_tags = self.add_post(route, target, "message", tags)
+            return out_tags
 
-        tag = to_tag()
-        return tag.render()
+        html_items = [tag.render() for tag in to_tag()]
+        print(html_items)
+        return "\n".join(html_items)
 
     def register(self):
         self.app.add_api_route(
@@ -72,24 +80,34 @@ class App(BaseModel):
         self.app.add_api_route("/", self.render, methods=["GET"], response_class=HTMLResponse)
         return self
 
-    def input(self, frame_name: str, target: str = ""):
+    def add_post(self, hx_post: str, hx_target: str, out_hx_target: str, tags: list):
+        out_tags = []
+        for tag in tags:
+            tag["hx-target"] = hx_target
+            tag["hx-post"] = hx_post
+            out_tags.append(tag)
+        btn = button(
+            "Submit",
+            data_hx_post=f"/receiver?func_name={out_hx_target}",
+            data_hx_target=f"#{out_hx_target}",
+        )
+        out_tags.append(btn)
+        return out_tags
+
+    def input(self, frame_name: str, target: str = "", out_target: str = ""):
         def decorator(func):
             func_name = func.__name__
-            self.append_function(func, target)
             if target != "":
-                if target == func_name:
-                    _id = "this"
-                else:
-                    _id = f"#{target}"
+                _target = f"#{target}"
                 route = f"/receiver?func_name={target}"
             else:
                 route = f"/receiver?func_name={func_name}"
 
-            tag = func()
-            tag["hx-target"] = _id
-            tag["hx-post"] = route
-            self.append_frame(frame_name, tag, "form")
-            return tag
+            tags = func()
+            out_tags = self.add_post(route, _target, out_target, tags)
+            self.append_function(func, route, _target)
+            _ = [self.append_frame(frame_name, tag, "form") for tag in out_tags]
+            return out_tags
 
         return decorator
 
@@ -120,17 +138,18 @@ class App(BaseModel):
 
 class Select(BaseModel):
     name: str = ""
-    options: List[Any]
+    options: List[str]
+    selected: str = ""
 
     @classmethod
     def from_list(cls, name: str, options: List):
-        out_options = []
-        for opt in options:
-            out_options.append(option(opt))
-        return cls(name=name, options=out_options)
+        return cls(name=name, options=options)
 
     def to_tag(self):
         sel = select(name=self.name)
         for opt in self.options:
-            sel.add(opt)
+            if opt == self.selected:
+                sel.add(option(opt, selected=True))
+            else:
+                sel.add(option(opt))
         return sel
