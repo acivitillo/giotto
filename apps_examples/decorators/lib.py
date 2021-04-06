@@ -5,22 +5,45 @@ from typing import List, Dict, Any, Callable, Literal
 from dominate.tags import h1, select, option, div, body, head, script, form, button
 from dominate import document
 from pydantic import BaseModel
-from functools import wraps
+from pprint import pprint
 
 
 class Frame(BaseModel):
     id_: str
     func: Callable
     target: str = ""
-    arguments: List[str] = []
     out_target: str = ""
-    tags: List[Any] = []
     type_: Literal["form", "div"] = "div"
 
-    def to_tag(self):
+    @property
+    def arguments(self):
+        return list(inspect.signature(self.func).parameters)
+
+    def to_tag(self, **form_kwargs):
+        func_kwargs = {}
+        for arg in self.arguments:
+            if arg in form_kwargs:
+                func_kwargs[arg] = form_kwargs[arg]
+        tags = self.func(**func_kwargs)
+        tags = self.add_post(tags)
         tag = eval(self.type_)
-        tag = tag(self.tags, _id=self.id_)
+        tag = tag(tags, _id=self.id_)
         return tag
+
+    def add_post(self, tags):
+        if self.target:
+            for tag in tags:
+                tag["hx-target"] = f"#{self.target}"
+                tag["hx-post"] = f"/receiver?func_name={self.target}"
+
+        if self.out_target:
+            btn = button(
+                "Submit",
+                data_hx_post=f"/receiver?func_name={self.out_target}",
+                data_hx_target=f"#{self.out_target}",
+            )
+            tags.append(btn)
+        return tags
 
 
 class App(BaseModel):
@@ -35,46 +58,12 @@ class App(BaseModel):
         return self
 
     async def receiver(self, request: Request, func_name: str):
-        # How is this request generated ???
         form = await request.form()
-        print(form)
-
-        def to_tag():
-            from pprint import pprint
-
-            print(func_name)
-            print("\nFRAMES:")
-            pprint({k: v.dict() for k, v in self.frames.items()})
-            frame = self.frames[func_name]
-            func_args = []
-            for arg in frame.arguments:
-                try:
-                    func_args.append(form[arg])
-                except KeyError:
-                    raise KeyError(f"Value {arg} in function {func_name} not in form data")
-            tags = frame.func(*func_args)
-            self.add_post(tags, frame.target, frame.out_target)
-            return tags
-
-        html_items = [tag.render() for tag in to_tag()]
-        # print(html_items)
-        return "\n".join(html_items)
-
-    @staticmethod
-    def add_post(tags: list, hx_target: str, out_hx_target: str):
-        for tag in tags:
-            if hx_target:
-                tag["hx-target"] = f"#{hx_target}"
-                tag["hx-post"] = f"/receiver?func_name={hx_target}"
-
-        if out_hx_target:
-            btn = button(
-                "Submit",
-                data_hx_post=f"/receiver?func_name={out_hx_target}",
-                data_hx_target=f"#{out_hx_target}",
-            )
-            tags.append(btn)
-        return tags
+        # print(form, func_name, "\nFRAMES:")
+        # pprint({k: v.dict() for k, v in self.frames.items()})
+        frame = self.frames[func_name]
+        tag = frame.to_tag(**form)
+        return tag.render()
 
     def render(self):
         doc = document()
@@ -85,34 +74,24 @@ class App(BaseModel):
 
     def input(self, target: str = "", out_target: str = ""):
         def decorator(func):
-            tags = func()
-            self.add_post(tags, target, out_target)
-            self.append_frame(func, tags, target, out_target, "form")
-            return tags
+            self.append_frame(func, target, out_target, "form")
 
         return decorator
 
     def output(self):
         def decorator(func):
-            tags = func()
-            self.append_frame(func, tags)
-            return tags
+            self.append_frame(func)
 
         return decorator
 
-    def append_frame(
-        self, func, tags: Any, target: str = "", out_target: str = "", frame_type: str = "div"
-    ):
+    def append_frame(self, func, target: str = "", out_target: str = "", frame_type: str = "div"):
         func_name = func.__name__
-        arguments = [arg for arg in inspect.signature(func).parameters]
         self.frames[func_name] = Frame(
             **{
                 "id_": func_name,
                 "func": func,
                 "target": target,
-                "arguments": arguments,
                 "out_target": out_target,
-                "tags": tags,
                 "type_": frame_type,
             }
         )
