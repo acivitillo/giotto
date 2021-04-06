@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from dominate.tags import (
     _input,
@@ -43,7 +43,7 @@ class Select(Partial):
     def _to_tag(self):
         class_ = (
             "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none m-2"
+            " hover:border-gray-400 focus:outline-none"
         )
         tag = select(_class=class_)
         tag.add(option("", value=""))
@@ -82,7 +82,7 @@ class Input(Partial):
     def _to_tag(self):
         class_ = (
             "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none m-2"
+            " hover:border-gray-400 focus:outline-none"
         )
         tag = _input(type=self.type_, _class=class_, placeholder=self.placeholder)
         if self.value:
@@ -136,7 +136,7 @@ class Button(Partial):
         if self.is_flex:
             size = ""
         _class = (
-            f"uppercase mt-1 {size}rounded-lg bg-{self.color}-400"
+            f"uppercase {size}rounded-lg bg-{self.color}-400"
             f" items-center font-medium text-black max-w-max shadow-sm cursor-pointer"
             f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
             f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
@@ -327,3 +327,38 @@ class TabContainer(Partial):
 #                                              Table()]))
 
 # tab_container_1 = TabContainer(tabs=[tab1, tab2, tab3])
+
+
+class ConnectedDropdowns(Partial):
+    data: Dict[str, Any]
+    filters: Dict[str, Any] = {}
+
+    def filter_data(self):
+        if self.filters:
+            from pandas import DataFrame
+
+            df = DataFrame(self.data)
+            for key, values in self.filters.items():
+                self.data[key] = df.to_dict("list")[key]
+                if values:
+                    values = [values] if isinstance(values, str) else list(values)
+                    df = df.query(f"{key} in {values}")
+
+            # self.data = df.to_dict("list")
+
+    @property
+    def components(self):
+        components = []
+        for name, values in self.data.items():
+            tag = Select(
+                options=list(set(values)),
+                selected=self.filters.get(name, ""),
+                # label=name.capitalize(),
+                name=name,
+            ).to_tag()
+            components.append(tag)
+        return components
+
+    def to_tag(self):
+        self.filter_data()
+        return self.components
