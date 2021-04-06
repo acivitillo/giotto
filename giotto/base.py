@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from dominate.tags import div, label
 from pydantic import BaseModel
@@ -10,6 +10,7 @@ class Action(BaseModel):
     trigger: Optional[str] = None
     target: Optional[str] = None
     confirm: Optional[str] = None
+    swap: Optional[str] = "outerHTML"
 
     @property
     def hx_kwargs(self):
@@ -19,7 +20,7 @@ class Action(BaseModel):
             "data-hx-trigger": self.trigger,
             "data-hx-target": self.target,
             "data-hx-confirm": self.confirm,
-            "data-hx-swap": "outerHTML",
+            "data-hx-swap": self.swap,
         }
         return {key: value for key, value in kwargs.items() if value is not None}
 
