@@ -43,8 +43,22 @@ class Partial(BaseModel):
         # abstract method, needs to be implemented in child
         return div()
 
+    def _to_tags(self):
+        return [self._to_tag()]
+
     def to_tag(self):
         tag = self._to_tag()
+        tag = self._update_tag(tag)
+        return tag
+
+    def to_tags(self):
+        tags = []
+        for tag in self._to_tags():
+            tag = self._update_tag(tag)
+            tags.append(tag)
+        return tags
+
+    def _update_tag(self, tag):
         if self.id_:
             tag.attributes.update({"id": self.id_})
         if self.name:

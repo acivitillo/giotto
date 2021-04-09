@@ -32,6 +32,7 @@ from .icons import (
     IconPreviousPage,
     IconSearch,
 )
+from copy import deepcopy
 
 
 class Select(Partial):
@@ -332,22 +333,27 @@ class ConnectedDropdowns(Partial):
     filters: Dict[str, Any] = {}
 
     def filter_data(self):
+        data = deepcopy(self.data)
         if self.filters:
             from pandas import DataFrame
 
-            df = DataFrame(self.data)
+            df = DataFrame(data)
+
             for key, values in self.filters.items():
-                self.data[key] = df.to_dict("list")[key]
+                data[key] = df.to_dict("list")[key]
                 if values:
                     values = [values] if isinstance(values, str) else list(values)
                     df = df.query(f"{key} in {values}")
 
-            # self.data = df.to_dict("list")
+        return data
 
-    @property
-    def components(self):
+    def _to_tag(self):
+        return div(self._to_tags())
+
+    def _to_tags(self):
         components = []
-        for name, values in self.data.items():
+        data = self.filter_data()
+        for name, values in data.items():
             tag = Select(
                 options=list(set(values)),
                 selected=self.filters.get(name, ""),
@@ -356,7 +362,3 @@ class ConnectedDropdowns(Partial):
             ).to_tag()
             components.append(tag)
         return components
-
-    def to_tag(self):
-        self.filter_data()
-        return self.components

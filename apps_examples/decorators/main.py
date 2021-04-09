@@ -19,7 +19,7 @@ webapp = App(
 webapp.register()
 
 
-@webapp.input(target="inp_cascading_selects", out_target="out_cascading_selects_1")
+@webapp.frame(autorefresh=True, target="out_cascading_selects_1", type_="form")
 def inp_cascading_selects(table: str = "", fruit: str = "", city: str = "", independent: str = ""):
     data = {
         "table": ["agrumi", "agrumi", "vegetables", "nuts", "nuts"],
@@ -28,49 +28,47 @@ def inp_cascading_selects(table: str = "", fruit: str = "", city: str = "", inde
     }
     independents = ["movies", "books", "etc"]
 
-    sel1 = ConnectedDropdowns(
-        data=data, filters={"table": table, "fruit": fruit, "city": city}
-    ).to_tag()
-    sel3 = Select(name="independent", options=independents, selected=independent).to_tag()
-    return [*sel1, sel3]
+    sel1 = ConnectedDropdowns(data=data, filters={"table": table, "fruit": fruit, "city": city})
+    sel3 = Select(name="independent", options=independents, selected=independent)
+    return [sel1, sel3]
 
 
-@webapp.input(out_target="out_cascading_selects_2", class_="flex flex-col m-4 border")
+@webapp.frame(target="out_cascading_selects_2", class_="flex flex-col m-4 border", type_="form")
 def out_cascading_selects_1(table: str = "", fruit: str = "", independent: str = ""):
     text = (
         f"You selected table: {table}<br>"
         f"You selected fruit: {fruit}<br>"
         f"You selected independent: {independent}"
     )
-    text = Text(value=text).to_tag()
-    inp = Input(placeholder="Add your comment", name="comment").to_tag()
+    text = Text(value=text)
+    inp = Input(placeholder="Add your comment", name="comment")
     return [text, inp]
 
 
-@webapp.output()
+@webapp.frame()
 def out_cascading_selects_2(comment: str = ""):
     if comment:
-        tag = p(f'Your comment: "{comment}" has been saved.')
+        text = Text(value=f'Your comment: "{comment}" has been saved.')
     else:
-        tag = p()
-    return [tag]
+        text = Text(value="")
+    return [text]
 
 
-@webapp.input(out_target="out_addtwo")
+@webapp.frame(target="out_addtwo", type_="form")
 def inp_addtwo():
     vals1 = [1, 2, 3]
     vals2 = [1, 2, 3]
-    sel1 = Select(name="x", options=vals1).to_tag()
-    sel2 = Select(name="y", options=vals2).to_tag()
+    sel1 = Select(name="x", options=vals1)
+    sel2 = Select(name="y", options=vals2)
     return [sel1, sel2]
 
 
-@webapp.output()
+@webapp.frame()
 def out_addtwo(x: int = 0, y: int = 0):
     s = int(x) + int(y)
-    return [p(f"The sum of your selected values is {s}")]
+    return [Text(value=f"The sum of your selected values is {s}")]
 
 
-@webapp.output()
+@webapp.frame()
 def hello():
-    return [p("Hello :) This is a static frame!")]
+    return [Text(value="Hello :) This is a static frame!")]
