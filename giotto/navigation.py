@@ -1,8 +1,9 @@
-from pydantic import BaseModel
 from typing import List
-from dominate.tags import div, nav, ul, li, a, h1, img, aside, span
 
-from .icons import IconHMenu, IconFiles
+from dominate.tags import a, aside, div, h1, img, li, nav, span, ul
+from pydantic import BaseModel
+
+from .icons import IconFiles, IconHMenu
 
 
 class TopBar(BaseModel):

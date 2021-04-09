@@ -6,6 +6,7 @@ from dominate.tags import (
     a,
     button,
     div,
+    label,
     li,
     nav,
     option,
@@ -18,7 +19,6 @@ from dominate.tags import (
     thead,
     tr,
     ul,
-    label,
 )
 from dominate.util import raw
 from markdown import markdown
@@ -26,14 +26,12 @@ from markdown import markdown
 from .base import Partial
 from .icons import (
     Icon,
-    IconDownarrow,
     IconFirstPage,
     IconLastPage,
     IconNextPage,
     IconPreviousPage,
     IconSearch,
 )
-from pydantic import validator
 
 
 class Select(Partial):

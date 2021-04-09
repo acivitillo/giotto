@@ -1,8 +1,8 @@
 import inspect
-from typing import Any, Callable, Dict, Literal, List
+from typing import Any, Callable, Dict, List, Literal
 
 from dominate import document
-from dominate.tags import body, div, form, head, link, main, script, input_, html_tag
+from dominate.tags import body, div, form, head, html_tag, input_, link, main, script
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel

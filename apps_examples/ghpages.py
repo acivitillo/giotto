@@ -10,10 +10,9 @@ from giotto.templates import AppSite
 from giotto.elements import Text, Box
 
 from . import mockapis
-from .local_configs import proxy_url
 
 
-proxy_url = proxy_url or os.getenv("HTTP_PROXY", "")
+proxy_url = os.getenv("HTTP_PROXY", "")
 prefix = "ghpage"
 router = APIRouter(prefix=f"/{prefix}")
 
