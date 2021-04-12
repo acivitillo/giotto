@@ -1,43 +1,32 @@
-from dominate.tags import li, p, ul
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-
-from giotto.elements import Select, ConnectedDropdowns, Input, Text, Column
-from giotto.navigation import Sidebar
+from giotto.elements import ConnectedDropdowns, Input, Select, Text
 from giotto.templates import App
-import mockapis
+from giotto.navigation import Sidebar
 
-app = FastAPI()
-app.mount("/giotto-statics", StaticFiles(packages=["giotto"]))
-webapp = App(
-    app=app,
-    sidebar=Sidebar(
-        items=mockapis.sidebar_items,
-        selected={"lev1": "ACOE", "lev2": "Scheduler"},
-    ),
-)
-webapp.register()
+from . import mockapis
+
+
+webapp = App(prefix="/frames", sidebar=Sidebar(items=mockapis.sidebar_items))
 
 
 @webapp.frame(autorefresh=True, target="out_cascading_selects_1", type_="form")
-def inp_cascading_selects(table: str = "", fruit: str = "", city: str = "", independent: str = ""):
-    data = {
-        "table": ["agrumi", "agrumi", "vegetables", "nuts", "nuts"],
-        "fruit": ["oranges", "lemons", "lettuce", "walnuts", "whatever"],
-        "city": ["london", "london", "london", "krakow", "krakow"],
-    }
+def inp_cascading_selects(
+    source: str = "", schema: str = "", table: str = "", column: str = "", independent: str = ""
+):
+    data = mockapis.sources
     independents = ["movies", "books", "etc"]
 
-    sel1 = ConnectedDropdowns(data=data, filters={"table": table, "fruit": fruit, "city": city})
+    sel1 = ConnectedDropdowns(
+        data=data, filters={"source": source, "schema": schema, "table": table, "column": column}
+    )
     sel3 = Select(name="independent", options=independents, selected=independent)
     return [sel1, sel3]
 
 
 @webapp.frame(target="out_cascading_selects_2", class_="flex flex-col m-4 border", type_="form")
-def out_cascading_selects_1(table: str = "", fruit: str = "", independent: str = ""):
+def out_cascading_selects_1(source: str = "", schema: str = "", independent: str = ""):
     text = (
-        f"You selected table: {table}<br>"
-        f"You selected fruit: {fruit}<br>"
+        f"You selected source: {source}<br>"
+        f"You selected schema: {schema}<br>"
         f"You selected independent: {independent}"
     )
     text = Text(value=text)
