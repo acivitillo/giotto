@@ -10,7 +10,7 @@ class Action(BaseModel):
     trigger: Optional[str] = None
     target: Optional[str] = None
     confirm: Optional[str] = None
-    swap: Optional[str] = "outerHTML"
+    swap: Optional[str] = None
 
     @property
     def hx_kwargs(self):
