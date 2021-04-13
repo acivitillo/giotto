@@ -15,31 +15,44 @@ from giotto.elements import Button
 from giotto.navigation import Sidebar, TopBar
 
 
-class Frame(BaseModel):
+class AppAction(BaseModel):
     id_: str
     func: Callable
     prefix: str
-    autorefresh: bool = False
     target: str = ""
-    type_: Literal["form", "div"] = "div"
-    class_: str = ""
-    response: Any = List[Partial]
 
-    @validator("class_", always=True)
-    def set_class_(cls, v):
-        return v or "flex flex-row items-center m-4 border"
+    def get_hx_action(self, func_kwargs: Dict[str, str] = None):
+        target = f"#{self.target}" if self.target else None
+        if func_kwargs:
+            kwargs = "&".join([f"{k}={v}" for k, v in func_kwargs.items()])
+            kwargs = f"&{kwargs}"
+        else:
+            kwargs = ""
+        return Action(url=f"{self.prefix}/receiver?func_name={self.id_}{kwargs}", target=target)
 
     @property
     def arguments(self):
         return list(inspect.signature(self.func).parameters)
 
-    def get_content(self, **kwargs) -> List[Partial]:
-        """Return list of frame's inside tags."""
+    def run(self, **kwargs):
+        return self.func(**kwargs)
+
+
+class Frame(AppAction):
+    autorefresh: bool = False
+    type_: Literal["form", "div"] = "div"
+    class_: str = ""
+
+    @validator("class_", always=True)
+    def set_class_(cls, v):
+        return v or "flex flex-row items-center m-4 border"
+
+    def to_partials(self, **kwargs) -> List[Partial]:
+        """Return list of partials inside of the frame."""
         func_kwargs = {}
         for arg in self.arguments:
             if arg in kwargs:
                 func_kwargs[arg] = kwargs[arg]
-                print(arg, kwargs[arg])
         content = self.func(**func_kwargs)
         self._validate_func_output(content)
         tags = self.add_post(content)
@@ -51,36 +64,33 @@ class Frame(BaseModel):
         assert isinstance(output, list), mess
         assert all([isinstance(el, Partial) for el in output]), mess
 
-    def to_tag(self, **form_kwargs) -> html_tag:
-        """Return full frame in tag form."""
-        content = self.get_content(**form_kwargs)
-        tags = [tag for el in content for tag in el.to_tags()]
-        tag = eval(self.type_)
-        tag = tag(tags, _id=self.id_, _class=self.class_)
-        return tag
-
     def add_post(self, content: List[Partial]):
         if self.type_ == "form":
             if self.autorefresh:
                 for el in content:
-                    el.action = Action(
-                        url=f"{self.prefix}/receiver?func_name={self.id_}",
-                        target=f"#{self.id_}",
-                        swap=None,
-                    )
-
-            if self.target:
-                btn = Button(
-                    description="Submit",
-                    action=Action(
-                        url=f"{self.prefix}/receiver?func_name={self.target}",
-                        target=f"#{self.target}",
-                        swap=None,
-                    ),
-                    height=10,
-                )
-                content.append(btn)
+                    if el.action is None:
+                        el.action = Action(
+                            url=f"{self.prefix}/receiver?func_name={self.id_}",
+                            target=f"#{self.id_}",
+                        )
         return content
+
+    def to_tags(self, **kwargs) -> html_tag:
+        """Return list of tags inside of the frame."""
+        content = self.to_partials(**kwargs)
+        tags = [tag for el in content for tag in el.to_tags()]
+        return tags
+
+    def to_tag(self, **kwargs) -> html_tag:
+        """Return full frame in tag form."""
+        tags = self.to_tags(**kwargs)
+        tag = eval(self.type_)
+        tag = tag(tags, _id=self.id_, _class=self.class_)
+        return tag
+
+    def run(self, **kwargs):
+        tags = self.to_tags(**kwargs)
+        return "\n".join([tag.render() for tag in tags])
 
 
 class AppSite(BaseModel):
@@ -118,41 +128,50 @@ class App(BaseModel):
     prefix: str
     app: Any = None
     sidebar: Sidebar = None
+    actions: Dict[str, AppAction] = {}
     frames: Dict[str, Frame] = {}
+
+    @property
+    def functions(self):
+        return {**self.actions, **self.frames}
 
     def __init__(self, **data: Any):
         super().__init__(**data)
 
-        self.app = self.app or APIRouter()
+        self.app = self.app or APIRouter(prefix=self.prefix)
 
         self.app.add_api_route(
-            f"{self.prefix}/receiver",
+            "/receiver",
             self.receiver,
             methods=["POST", "GET"],
             response_class=HTMLResponse,
         )
-        self.app.add_api_route(
-            f"{self.prefix}/", self.to_html, methods=["GET"], response_class=HTMLResponse
-        )
+        self.app.add_api_route("/", self.to_html, methods=["GET"], response_class=HTMLResponse)
 
     # try to fetch params from request
     async def receiver(self, request: Request, func_name: str) -> str:
         form = await request.form()
-        frame = self.frames[func_name]
+        print(form)
+        func = self.functions[func_name]
         kwargs = {**form, **request.query_params}
-        print(kwargs)
-        content = frame.get_content(**kwargs)
-        tags = [tag for el in content for tag in el.to_tags()]
-        return "\n".join([tag.render() for tag in tags])
+        del kwargs["func_name"]
+        return func.run(**kwargs)
 
     def to_html(self):
         content = div(*[frame.to_tag() for frame in self.frames.values()])
         site = AppSite(sidebar=self.sidebar, content=content)
         return site.to_html()
 
-    def frame(
-        self, autorefresh: bool = False, target: str = "", type_: str = "div", class_: str = ""
-    ):
+    def action(self, target: str = ""):
+        def decorator(func):
+            func_name = func.__name__
+            self.actions[func_name] = AppAction(
+                **{"id_": func_name, "func": func, "prefix": self.prefix, "target": target}
+            )
+
+        return decorator
+
+    def frame(self, autorefresh: bool = False, type_: str = "div", class_: str = ""):
         def decorator(func):
             func_name = func.__name__
             self.frames[func_name] = Frame(
@@ -161,13 +180,16 @@ class App(BaseModel):
                     "func": func,
                     "prefix": self.prefix,
                     "autorefresh": autorefresh,
-                    "target": target,
+                    "target": func_name,
                     "type_": type_,
                     "class_": class_,
                 }
             )
 
         return decorator
+
+    def get_action(self, name: str, func_kwargs: Dict[str, str] = None):
+        return self.functions[name].get_hx_action(func_kwargs=func_kwargs)
 
 
 class MainApp(App):

@@ -20,6 +20,9 @@ webapp = App(
     ),
 )
 
+# FRAMES
+# ------
+
 
 @webapp.frame()
 def index():
