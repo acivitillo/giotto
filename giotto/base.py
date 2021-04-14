@@ -1,6 +1,7 @@
+from __future__ import annotations
 from typing import Any, Dict, Optional
 
-from dominate.tags import div, label
+from dominate.tags import div, html_tag, label
 from pydantic import BaseModel
 
 
@@ -25,10 +26,36 @@ class Action(BaseModel):
         return {key: value for key, value in kwargs.items() if value is not None}
 
 
+class Style(BaseModel):
+    height: Optional[int] = None
+    width: Optional[int] = None
+    margin: Optional[int] = None
+    rounded: bool = False
+    custom: str = ""
+    custom_remove: str = ""
+
+    def apply(self, tag: html_tag):
+        kwargs_1 = {
+            "h": self.height,
+            "w": self.width,
+            "m": self.margin,
+        }
+        for key, value in kwargs_1.items():
+            if value is not None:
+                tag.attributes["class"] += f" {key}-{value}"
+        kwargs_2 = {
+            "rounded-sm": self.rounded,
+        }
+        for key, value in kwargs_2.items():
+            if value:
+                tag.attributes["class"] += f" {key}"
+
+
 class Partial(BaseModel):
     id_: Optional[str] = None
     name: Optional[str] = None
     action: Optional[Action] = None
+    style: Optional[Style] = None
     label: str = ""
 
     @classmethod
@@ -65,6 +92,8 @@ class Partial(BaseModel):
             tag.attributes.update({"name": self.name})
         if self.action:
             tag.attributes.update(self.action.hx_kwargs)
+        if self.style:
+            self.style.apply(tag)
         if self.label:
             tag = label(self.label, tag, _class="ml-2")
         return tag

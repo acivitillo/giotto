@@ -1,9 +1,12 @@
-from giotto.base import Action
-from giotto.elements import Box, Button, ClickableIcon, Table, Text
+from typing import Any, Dict, List
+
+from fastapi.responses import HTMLResponse
+
+from giotto.base import Style
+from giotto.elements import Button, ClickableIcon, Column, Row, Table, Text
 from giotto.icons import IconBin, IconDetails, IconPlay, IconRefresh, IconStop
 from giotto.navigation import Sidebar
 from giotto.templates import App
-from fastapi.responses import HTMLResponse
 
 from . import mockapis
 
@@ -14,17 +17,64 @@ webapp = App(prefix="/scheduler", sidebar=Sidebar(items=mockapis.sidebar_items))
 # ------
 
 
-@webapp.frame(type_="form")
+@webapp.frame()
 def jobs():
-    return get_jobs_frame()
+    data = get_jobs_data()
+    data = format_jobs_data(data)
+    table = Table(
+        data=data,
+        max_rows=5,
+        column_width={"Action": "70px", "Created At": "100px", "Crons": "130px"},
+    )
+    return [table]
 
 
-@webapp.frame(class_="flex flex-col m-4 border")
+@webapp.frame(class_="flex flex-col mb-4 shadow sm:rounded-lg", style=Style(margin=1))
 def jobruns(job_name: str = "", message: str = ""):
     if job_name:
         return get_jobruns_frame(job_name=job_name, message=message)
     else:
         return []
+
+
+def get_jobruns_frame(job_name: str, message: str):
+    data = get_jobruns_data(job_name=job_name)
+    jobs_data = get_jobs_data(job_name=job_name)[0]
+    text = (
+        f"# {job_name}\n"
+        f"**Description**: {jobs_data['description']}<br>"
+        f"**Timeout**: {jobs_data['timeout']}<br>"
+        f"**Function**: {jobs_data['function']}<br>"
+        f"**Function Args**: {jobs_data['func_args']}<br>"
+        f"**Function Kwargs**: {jobs_data['func_kwargs']}<br>"
+    )
+    title = Text(value=text)
+    style = Style(margin=1, rounded=True, height=12)
+
+    action = webapp.get_action("run_job", func_kwargs={"job_name": job_name})
+    action.confirm = f"Are you sure you want to run {job_name}?"
+    run_btn = Button(description="Run", color="green", icon=IconPlay(), action=action, style=style)
+
+    action = webapp.get_action("stop_job", func_kwargs={"job_name": job_name})
+    action.confirm = f"Are you sure you want to stop {job_name}?"
+    stop_btn = Button(description="Stop", color="red", icon=IconStop(), action=action, style=style)
+
+    action = webapp.get_action("jobruns", func_kwargs={"job_name": job_name})
+    refresh_btn = Button(
+        description="Refresh", color="indigo", icon=IconRefresh(), action=action, style=style
+    )
+
+    action = webapp.get_action("unregister_job", func_kwargs={"job_name": job_name})
+    action.confirm = f"Are you sure you want to unregister {job_name}?"
+    unregister_btn = Button(
+        description="Unregister", color="purple", icon=IconBin(), action=action, style=style
+    )
+
+    text = Text(value=message, style=Style(margin=1))
+    table_jobruns = Table(data=data, max_rows=5)
+    buttons = Row(contents=[run_btn, stop_btn, unregister_btn, refresh_btn, text])
+    box = Column(contents=[title, buttons])
+    return [box, table_jobruns]
 
 
 # ACTIONS
@@ -58,15 +108,8 @@ def unregister_job(job_name: str):
     return response
 
 
-# JOBS
-# ----
-
-
-def get_jobs_frame():
-    data = get_jobs_data()
-    data = format_jobs_data(data)
-    table = Table(data=data, max_rows=5)
-    return [table]
+# LOADING AND FORMATTING DATA
+# ---------------------------
 
 
 def get_jobs_data(job_name: str = None):
@@ -78,7 +121,7 @@ def get_jobs_data(job_name: str = None):
     return data
 
 
-def format_jobs_data(data):
+def format_jobs_data(data: List[Dict[str, Any]]):
     def remove_first_and_last(x):
         return str(x)[1:-1]
 
@@ -103,44 +146,6 @@ def format_jobs_data(data):
                 new_row[new_key] = formatter[key](value)
         new_data.append(new_row)
     return new_data
-
-
-#  JOB RUNS
-# ---------
-
-
-def get_jobruns_frame(job_name: str, message: str):
-    data = get_jobruns_data(job_name=job_name)
-    jobs_data = get_jobs_data(job_name=job_name)[0]
-    text = (
-        f"# {job_name}\n"
-        f"**Description**: {jobs_data['description']}<br>"
-        f"**Timeout**: {jobs_data['timeout']}<br>"
-        f"**Function**: {jobs_data['function']}<br>"
-        f"**Function Args**: {jobs_data['func_args']}<br>"
-        f"**Function Kwargs**: {jobs_data['func_kwargs']}<br>"
-    )
-    title = Text(value=text)
-
-    action = webapp.get_action("run_job", func_kwargs={"job_name": job_name})
-    action.confirm = f"Are you sure you want to run {job_name}?"
-    run_btn = Button(description="Run", color="green", icon=IconPlay(), action=action)
-
-    action = webapp.get_action("stop_job", func_kwargs={"job_name": job_name})
-    action.confirm = f"Are you sure you want to stop {job_name}?"
-    stop_btn = Button(description="Stop", color="red", icon=IconStop(), action=action)
-
-    action = webapp.get_action("jobruns", func_kwargs={"job_name": job_name})
-    refresh_btn = Button(description="Refresh", color="indigo", icon=IconRefresh(), action=action)
-
-    action = webapp.get_action("unregister_job", func_kwargs={"job_name": job_name})
-    action.confirm = f"Are you sure you want to unregister {job_name}?"
-    unregister_btn = Button(description="Unregister", color="purple", icon=IconBin(), action=action)
-
-    text = Text(value=message)
-    table_jobruns = Table(data=data, max_rows=5)
-    box = Box(contents=[title, run_btn, stop_btn, unregister_btn, refresh_btn, text])
-    return [box, table_jobruns]
 
 
 def get_jobruns_data(job_name: str):

@@ -41,7 +41,7 @@ class Select(Partial):
 
     def _to_tag(self):
         class_ = (
-            "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
+            "border border-gray-300 text-gray-600 pl-5 bg-white"
             " hover:border-gray-400 focus:outline-none"
         )
         tag = select(_class=class_)
@@ -60,8 +60,8 @@ class MultiSelect(Partial):
 
     def _to_tag(self):
         class_ = (
-            "border border-gray-300 text-gray-600 h-20 pl-5 w-56 bg-white"
-            " hover:border-gray-400 focus:outline-none m-2"
+            "border border-gray-300 text-gray-600 pl-5 bg-white"
+            " hover:border-gray-400 focus:outline-none"
         )
         tag = select(_class=class_, multiple="multiple")
         tag.add(option(_class="hidden"))
@@ -80,7 +80,7 @@ class Input(Partial):
 
     def _to_tag(self):
         class_ = (
-            "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
+            "border border-gray-300 text-gray-600 pl-5 bg-white"
             " hover:border-gray-400 focus:outline-none"
         )
         tag = _input(type=self.type_, _class=class_, placeholder=self.placeholder)
@@ -107,7 +107,7 @@ class Row(Partial):
     contents: List[Partial]
 
     def _to_tag(self):
-        tag = div(_class="flex flex-row")
+        tag = div(_class="flex flex-row items-center")
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
@@ -127,15 +127,10 @@ class Button(Partial):
     description: str = ""
     icon: Optional[Icon]
     color: str = "blue"
-    is_flex: bool = False
-    height: int = 12
 
     def _to_tag(self):
-        size = f"px-5 h-{self.height} "
-        if self.is_flex:
-            size = ""
         _class = (
-            f"uppercase {size}rounded-lg bg-{self.color}-400"
+            f"uppercase bg-{self.color}-400 px-5"
             f" items-center font-medium text-black max-w-max shadow-sm cursor-pointer"
             f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
             f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
@@ -152,7 +147,7 @@ class ClickableIcon(Partial):
 
     def _to_tag(self):
         tag = div(
-            _class="w-4 mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer",
+            _class="mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer",
         )
         tag.add(self.icon.to_tag())
         return tag
@@ -166,7 +161,7 @@ class Table(Partial):
 
     def _to_tag(self):
         tag = div(
-            _class="mt-2 shadow sm:rounded-lg",
+            _class="shadow sm:rounded",
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
@@ -185,7 +180,7 @@ class Table(Partial):
             type="search",
             _class=(
                 "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-                " hover:border-gray-400 focus:outline-none appearance-none mt-1"
+                " hover:border-gray-400 focus:outline-none appearance-none sm:rounded-t"
             ),
             placeholder="Search",
             data_action="input->table#filter",
@@ -237,13 +232,13 @@ class Table(Partial):
         total = span(len(self.data), data_table_target="total")
         desc = div(total, span(" results"), _class="text-gray-500")
         button_class = (
-            "relative inline-flex items-center px-2 py-2 border border-gray-300"
+            "relative inline-flex items-center px-2 py-1 border border-gray-200"
             " bg-white text-gray-500 hover:bg-gray-50 focus:outline-none"
         )
         first_button = button(
             IconFirstPage().to_tag(),
             data_action="click->table#firstPage",
-            _class=button_class + " rounded-l-md",
+            _class=button_class + " rounded-l",
         )
         prev_button = button(
             IconPreviousPage().to_tag(),
@@ -256,14 +251,14 @@ class Table(Partial):
         last_button = button(
             IconLastPage().to_tag(),
             data_action="click->table#lastPage",
-            _class=button_class + " rounded-r-md",
+            _class=button_class + " rounded-r",
         )
         buttons = nav(
             first_button,
             prev_button,
             next_button,
             last_button,
-            _class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
+            _class="relative z-0 inline-flex shadow-sm -space-x-px",
         )
         _div = div(
             desc,
@@ -298,7 +293,7 @@ class TabContainer(Partial):
     clicked: Tab
 
     def _to_tag(self):
-        _tag = div(_class="flex-1 w-44 ml-5 mt-10")
+        _tag = div(_class="flex-1 ml-5 mt-10")
         _style = div(_style="border-bottom: 2px solid #eaeaea")
         _ul = ul(_class="flex cursor-pointer")
         # DEFAULT FIRST ONE CLICKED

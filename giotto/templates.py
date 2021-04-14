@@ -1,17 +1,14 @@
 import inspect
-from typing import Any, Callable, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 from dominate import document
 from dominate.tags import body, div, form, head, html_tag, input_, link, main, script
-from fastapi import Request
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, validator
-from fastapi import APIRouter
 
-from giotto.base import Action, Partial
-from giotto.elements import Button
+from giotto.base import Action, Partial, Style
 from giotto.navigation import Sidebar, TopBar
 
 
@@ -21,7 +18,7 @@ class AppAction(BaseModel):
     prefix: str
     target: str = ""
 
-    def get_hx_action(self, func_kwargs: Dict[str, str] = None):
+    def get_hx_action(self, func_kwargs: Dict[str, str] = None) -> Action:
         target = f"#{self.target}" if self.target else None
         if func_kwargs:
             kwargs = "&".join([f"{k}={v}" for k, v in func_kwargs.items()])
@@ -34,49 +31,39 @@ class AppAction(BaseModel):
     def arguments(self):
         return list(inspect.signature(self.func).parameters)
 
-    def run(self, **kwargs):
+    def run(self, **kwargs) -> Any:
         return self.func(**kwargs)
 
 
 class Frame(AppAction):
-    autorefresh: bool = False
     type_: Literal["form", "div"] = "div"
     class_: str = ""
+    style: Optional[Style] = None
 
     @validator("class_", always=True)
     def set_class_(cls, v):
-        return v or "flex flex-row items-center m-4 border"
+        return v or "flex flex-row items-center mb-2 shadow sm:rounded"
 
     def to_partials(self, **kwargs) -> List[Partial]:
-        """Return list of partials inside of the frame."""
+        """Return list of frame's inner partials."""
         func_kwargs = {}
         for arg in self.arguments:
             if arg in kwargs:
                 func_kwargs[arg] = kwargs[arg]
         content = self.func(**func_kwargs)
         self._validate_func_output(content)
-        tags = self.add_post(content)
-        return tags
+        for partial in content:
+            partial.style = partial.style or self.style
+        return content
 
     @staticmethod
-    def _validate_func_output(output: Any):
+    def _validate_func_output(output: List[Partial]):
         mess = "Output of a frame should be a list of Partials"
         assert isinstance(output, list), mess
         assert all([isinstance(el, Partial) for el in output]), mess
 
-    def add_post(self, content: List[Partial]):
-        if self.type_ == "form":
-            if self.autorefresh:
-                for el in content:
-                    if el.action is None:
-                        el.action = Action(
-                            url=f"{self.prefix}/receiver?func_name={self.id_}",
-                            target=f"#{self.id_}",
-                        )
-        return content
-
-    def to_tags(self, **kwargs) -> html_tag:
-        """Return list of tags inside of the frame."""
+    def to_tags(self, **kwargs) -> List[html_tag]:
+        """Return list of frame's inner tags."""
         content = self.to_partials(**kwargs)
         tags = [tag for el in content for tag in el.to_tags()]
         return tags
@@ -88,7 +75,7 @@ class Frame(AppAction):
         tag = tag(tags, _id=self.id_, _class=self.class_)
         return tag
 
-    def run(self, **kwargs):
+    def run(self, **kwargs) -> str:
         tags = self.to_tags(**kwargs)
         return "\n".join([tag.render() for tag in tags])
 
@@ -96,7 +83,7 @@ class Frame(AppAction):
 class AppSite(BaseModel):
     title: str = "Giotto"
     site_name: str = "Site Name"
-    sidebar: Sidebar = None
+    sidebar: Optional[Sidebar] = None
     content: Any = div()
 
     @property
@@ -127,7 +114,7 @@ class AppSite(BaseModel):
 class App(BaseModel):
     prefix: str
     app: Any = None
-    sidebar: Sidebar = None
+    sidebar: Optional[Sidebar] = None
     actions: Dict[str, AppAction] = {}
     frames: Dict[str, Frame] = {}
 
@@ -171,7 +158,7 @@ class App(BaseModel):
 
         return decorator
 
-    def frame(self, autorefresh: bool = False, type_: str = "div", class_: str = ""):
+    def frame(self, type_: str = "div", class_: str = "", style: Style = None):
         def decorator(func):
             func_name = func.__name__
             self.frames[func_name] = Frame(
@@ -179,10 +166,10 @@ class App(BaseModel):
                     "id_": func_name,
                     "func": func,
                     "prefix": self.prefix,
-                    "autorefresh": autorefresh,
                     "target": func_name,
                     "type_": type_,
                     "class_": class_,
+                    "style": style,
                 }
             )
 
