@@ -12,14 +12,14 @@ Webpack is a tool to package css, js and other web formats.
 Initialize npm in the `giotto/statics/configs` folder:
 
 ```bash
-cd giotto/statics/configs
-npm init -y
+> cd giotto/statics/configs
+> npm init -y
 ```
 
 #### Install webpack
 
 ```bash
- install webpack webpack-cli html-webpack-plugin mini-css-extract-plugin  babel-loader @babel/core --save-dev
+ > install webpack webpack-cli html-webpack-plugin mini-css-extract-plugin  babel-loader @babel/core --save-dev
 ```
 
 You should now have the below structure in `statics`
@@ -38,8 +38,8 @@ statics
 The npm packages are tracked inside `statics/configs/package.json`. In order to make sure you have all the npm packages installed, do the following:
 
 ```bash
-cd giotto/statics/configs
-npm install
+> cd giotto/statics/configs
+> npm install
 ```
 
 This will save all the required npm packages inside the local folder `node_modules` inside `statics`.
@@ -49,7 +49,7 @@ This will save all the required npm packages inside the local folder `node_modul
 You can do:
 
 ```bash
-npm run start
+> npm run start
 ```
 
 In order to run 1 compile.
@@ -59,7 +59,7 @@ In order to run 1 compile.
 You can do:
 
 ```bash
-npx webpack --watch
+> npx webpack --watch
 ```
 
 To watch with webpack.
