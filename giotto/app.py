@@ -131,6 +131,7 @@ class BaseApp(BaseModel):
     sidebar: Optional[Sidebar] = None
     actions: Dict[str, AppAction] = {}
     frames: Dict[str, Frame] = {}
+    style: Optional[Style] = None
 
     def add_api_routes(self):
         self.app.add_api_route(
@@ -184,7 +185,7 @@ class BaseApp(BaseModel):
                     "target": func_name,
                     "type_": type_,
                     "class_": class_,
-                    "style": style,
+                    "style": style or self.style,
                 }
             )
 
