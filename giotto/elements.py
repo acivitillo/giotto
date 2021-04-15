@@ -155,7 +155,6 @@ class ClickableIcon(Partial):
 
 class Table(Partial):
     data: List[Dict]
-    description: Optional[str]
     max_rows: int = 1
     column_width: Dict = {}
 
