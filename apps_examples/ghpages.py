@@ -1,12 +1,10 @@
-import urllib3
 import json
-from dominate.tags import div
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
 import os
 
-from giotto.templates import App
-from giotto.elements import Text, Box
+import urllib3
+
+from giotto.app import App
+from giotto.elements import Box, Text
 from giotto.navigation import Sidebar
 
 from . import mockapis

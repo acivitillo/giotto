@@ -1,7 +1,7 @@
 from giotto.base import Style
 from giotto.elements import Button, Column, ConnectedDropdowns, Input, Select, Text
 from giotto.navigation import Sidebar
-from giotto.templates import App
+from giotto.app import App
 
 from . import mockapis
 

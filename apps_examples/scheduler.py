@@ -6,7 +6,7 @@ from giotto.base import Style
 from giotto.elements import Button, ClickableIcon, Column, Row, Table, Text
 from giotto.icons import IconBin, IconDetails, IconPlay, IconRefresh, IconStop
 from giotto.navigation import Sidebar
-from giotto.templates import App
+from giotto.app import App
 
 from . import mockapis
 
