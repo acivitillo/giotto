@@ -6,7 +6,7 @@ sidebar_items = [
         "text": "Documentation",
         "href": "#",
         "subheaders": [
-            {"text": "Giotto Readme", "href": "/ghpage?path=README.md&selected=Giotto Readme"},
+            {"text": "Giotto Readme", "href": "/ghpage/"},
             {"text": "Example link", "href": "#"},
         ],
     },
@@ -14,8 +14,8 @@ sidebar_items = [
         "text": "ACOE",
         "href": "#",
         "subheaders": [
-            {"text": "Scheduler", "href": "/scheduler?selected=Scheduler"},
-            {"text": "Crosstab", "href": "/crosstab?selected=Crosstab"},
+            {"text": "Scheduler", "href": "/scheduler/"},
+            {"text": "Connected Frames", "href": "/frames/"},
         ],
     },
 ]
@@ -176,3 +176,26 @@ sources = {
         "dance": {"rumba": ["move", "time"], "tango": ["move", "time"], "salsa": ["move", "time"]},
     },
 }
+
+
+records = [
+    ["redshift", "music", "track", "id"],
+    ["redshift", "mathematics", "squares", "area"],
+    ["redshift", "mathematics", "integrals", "formula"],
+    ["redshift", "cities", "london", "street"],
+    ["redshift", "cities", "london", "building"],
+    ["redshift", "cities", "london", "price"],
+    ["aurora", "music", "track", "id"],
+    ["aurora", "music", "artist", "name"],
+    ["aurora", "dance", "rumba", "move"],
+    ["aurora", "dance", "rumba", "time"],
+    ["aurora", "dance", "tango", "move"],
+    ["aurora", "dance", "tango", "time"],
+    ["aurora", "dance", "salsa", "move"],
+    ["aurora", "dance", "salsa", "time"],
+]
+
+sources = {"source": [], "schema": [], "table": [], "column": []}
+for record in records:
+    for index, value in enumerate(sources.values()):
+        value.append(record[index])

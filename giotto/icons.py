@@ -1,4 +1,4 @@
-from dominate.svg import svg, path
+from dominate.svg import path, svg
 
 from .base import Partial
 

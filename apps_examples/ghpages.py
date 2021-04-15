@@ -1,21 +1,33 @@
-import urllib3
 import json
-from dominate.tags import div
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
 import os
 
+import urllib3
+
+from giotto.app import App
+from giotto.elements import Box, Text
 from giotto.navigation import Sidebar
-from giotto.templates import AppSite
-from giotto.elements import Text, Box
 
 from . import mockapis
-from .local_configs import proxy_url
 
 
-proxy_url = proxy_url or os.getenv("HTTP_PROXY", "")
-prefix = "ghpage"
-router = APIRouter(prefix=f"/{prefix}")
+webapp = App(
+    prefix="/ghpage",
+    sidebar=Sidebar(
+        items=mockapis.sidebar_items,
+        selected={"lev1": "Documentation", "lev2": "Giotto Readme"},
+    ),
+)
+
+# FRAMES
+# ------
+
+
+@webapp.frame()
+def index():
+    proxy_url = os.getenv("HTTP_PROXY", "")
+    readme_md = get_readme(owner="acivitillo", repo="giotto", proxy_url=proxy_url, path="README.md")
+    text = Box(contents=[Text(value=readme_md)], centered=True)
+    return [text]
 
 
 def get_readme(owner: str, repo: str, path: str, proxy_url: str = "", token: str = ""):
@@ -31,22 +43,9 @@ def get_readme(owner: str, repo: str, path: str, proxy_url: str = "", token: str
     resp = con.request("GET", url, headers=headers)
     data = json.loads(resp.data)
     print("here", path)
+    out = ""
     for item in data:
         if item["name"] == path:
             resp = con.request("GET", item["download_url"], headers=headers)
             out = resp.data.decode("utf-8")
     return out
-
-
-@router.get("/", response_class=HTMLResponse)
-def index(path: str, selected: str = ""):
-    site = AppSite(
-        sidebar=Sidebar(
-            items=mockapis.sidebar_items,
-            selected={"lev1": "Documentation", "lev2": "Giotto Readme"},
-        )
-    )
-    readme_md = get_readme(owner="acivitillo", repo="giotto", proxy_url=proxy_url, path=path)
-    text = Box(contents=[Text(value=readme_md)], centered=True).to_tag()
-    site.content = div(text)
-    return site.to_html()
