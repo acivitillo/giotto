@@ -80,7 +80,7 @@ class Frame(AppFunction):
         """Return full frame in tag form."""
         tags = self.to_tags(**func_kwargs)
         tag = eval(self.type_)
-        tag = tag(tags, _id=self.id_, _class=self.class_)
+        tag = tag(tags, _id=self.id_, _class=self.class_, autocomplete="off")
         return tag
 
     def run(self, **func_kwargs) -> str:
@@ -92,6 +92,7 @@ class Frame(AppFunction):
 class Site(BaseModel):
     title: str = "Giotto"
     site_name: str = "Site Name"
+    topbar: Optional[TopBar] = None
     sidebar: Optional[Sidebar] = None
     content: Any = div()
 
@@ -105,14 +106,20 @@ class Site(BaseModel):
 
     @property
     def body(self) -> str:
-        topbar = TopBar(value=self.site_name).to_tag()
+        b = body()
+        if self.topbar:
+            b.add(self.topbar.to_tag())
+        b.add(self.body_container)
+        return b
+
+    @property
+    def body_container(self):
         m = main(self.content, _class="pt-8 px-8 overflow-x-auto flex-1")
         container = div(_class="flex", _style="height: 95vh")
         if self.sidebar:
             container.add(self.sidebar.to_tag())
         container.add(m)
-        b = body(topbar, container)
-        return b
+        return container
 
     def render(self) -> str:
         """Render site to html str."""
@@ -128,10 +135,11 @@ class Site(BaseModel):
 class BaseApp(BaseModel):
     app: Any
     prefix: str = ""
-    sidebar: Optional[Sidebar] = None
     actions: Dict[str, AppAction] = {}
     frames: Dict[str, Frame] = {}
     style: Optional[Style] = None
+    topbar: Optional[TopBar] = None
+    sidebar: Optional[Sidebar] = None
 
     def add_api_routes(self):
         self.app.add_api_route(
@@ -154,7 +162,7 @@ class BaseApp(BaseModel):
     def render(self) -> str:
         """Render app to html str."""
         content = div(*[frame.to_tag() for frame in self.frames.values()])
-        site = Site(sidebar=self.sidebar, content=content)
+        site = Site(sidebar=self.sidebar, topbar=self.topbar, content=content)
         return site.to_html()
 
     def to_html(self) -> str:

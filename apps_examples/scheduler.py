@@ -5,13 +5,17 @@ from fastapi.responses import HTMLResponse
 from giotto.base import Style
 from giotto.elements import Button, ClickableIcon, Column, Row, Table, Text
 from giotto.icons import IconBin, IconDetails, IconPlay, IconRefresh, IconStop
-from giotto.navigation import Sidebar
+from giotto.navigation import Sidebar, TopBar
 from giotto.app import App
 
 from . import mockapis
 
-prefix = "scheduler"
-webapp = App(prefix="/scheduler", sidebar=Sidebar(items=mockapis.sidebar_items))
+
+webapp = App(
+    prefix="/scheduler",
+    sidebar=Sidebar(items=mockapis.sidebar_items),
+    topbar=TopBar(value="Scheduler"),
+)
 
 # FRAMES
 # ------
