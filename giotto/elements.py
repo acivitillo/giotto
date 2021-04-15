@@ -74,7 +74,7 @@ class MultiSelect(Partial):
 
 
 class Input(Partial):
-    placeholder: str = "Search by name..."
+    placeholder: str = ""
     value: str = ""
     type_: str = "text"
 
@@ -124,7 +124,7 @@ class Column(Partial):
 
 
 class Button(Partial):
-    description: str = ""
+    description: str = "Submit"
     icon: Optional[Icon]
     color: str = "blue"
 
