@@ -160,7 +160,7 @@ class Table(Partial):
 
     def _to_tag(self):
         tag = div(
-            _class="shadow sm:rounded",
+            _class="shadow",
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
@@ -179,7 +179,7 @@ class Table(Partial):
             type="search",
             _class=(
                 "border border-gray-300 text-gray-600 h-10 pl-5 w-56 bg-white"
-                " hover:border-gray-400 focus:outline-none appearance-none sm:rounded-t"
+                " hover:border-gray-400 focus:outline-none appearance-none rounded-t"
             ),
             placeholder="Search",
             data_action="input->table#filter",
@@ -262,7 +262,7 @@ class Table(Partial):
         _div = div(
             desc,
             buttons,
-            _class="flex justify-between items-center sm:px-2 sm:py-2",
+            _class="flex justify-between items-center px-2 py-2",
         )
         return _div
 
