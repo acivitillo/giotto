@@ -1,6 +1,6 @@
 # Giotto
 
-![alt-text](./docs/giotto.gif)
+![alt-text](https://github.com/acivitillo/giotto/blob/main/docs/giotto.gif)
 ## Running the examples
 
 Please make sure that you have `HTTP_PROXY` in your environment variables if needed.
