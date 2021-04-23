@@ -49,7 +49,7 @@ class Frame(AppFunction):
 
     @validator("class_", always=True)
     def set_class_(cls, v):
-        return v or "flex flex-row items-center mb-2 shadow sm:rounded"
+        return v or "flex flex-row items-center mb-2 shadow rounded"
 
     def to_partials(self, **func_kwargs) -> List[Partial]:
         """Return list of frame's inner partials."""

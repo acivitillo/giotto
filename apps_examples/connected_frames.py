@@ -76,7 +76,7 @@ def out_addtwo(x: int = 0, y: int = 0):
 
 @webapp.frame()
 def hello():
-    return [Text(value="Hello :) This is a static frame!")]
+    return [Text(value="<p>Hello :) <br>This is a static frame!</p>")]
 
 
 @webapp.frame(style=style)

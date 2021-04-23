@@ -2,11 +2,11 @@ from typing import Any, Dict, List
 
 from fastapi.responses import HTMLResponse
 
+from giotto.app import App
 from giotto.base import Style
 from giotto.elements import Button, ClickableIcon, Column, Row, Table, Text
 from giotto.icons import IconBin, IconDetails, IconPlay, IconRefresh, IconStop
 from giotto.navigation import Sidebar, TopBar
-from giotto.app import App
 
 from . import mockapis
 
@@ -33,7 +33,7 @@ def jobs():
     return [table]
 
 
-@webapp.frame(class_="flex flex-col mb-4 shadow sm:rounded-lg", style=Style(margin=1))
+@webapp.frame()
 def jobruns(job_name: str = "", message: str = ""):
     if job_name:
         return get_jobruns_frame(job_name=job_name, message=message)
@@ -43,6 +43,7 @@ def jobruns(job_name: str = "", message: str = ""):
 
 def get_jobruns_frame(job_name: str, message: str):
     data = get_jobruns_data(job_name=job_name)
+    data = format_jobruns_data(data)
     jobs_data = get_jobs_data(job_name=job_name)[0]
     text = (
         f"# {job_name}\n"
@@ -52,7 +53,21 @@ def get_jobruns_frame(job_name: str, message: str):
         f"**Function Args**: {jobs_data['func_args']}<br>"
         f"**Function Kwargs**: {jobs_data['func_kwargs']}<br>"
     )
-    title = Text(value=text)
+    title = Text(value=text, style=Style(margin=1))
+    notification = Text(value=message, style=Style(margin=1))
+    buttons_row = Row(contents=[*get_buttons(job_name=job_name), notification])
+    table_jobruns = Table(
+        data=data,
+        max_rows=3,
+        column_width={"Id": "70px", "Created At": "200px", "Finished At": "200px"},
+        style=Style(margin=1),
+    )
+
+    box = Column(contents=[title, buttons_row, table_jobruns])
+    return [box]
+
+
+def get_buttons(job_name: str) -> List[Button]:
     style = Style(margin=1, rounded=True, height=12)
 
     action = webapp.get_action("run_job", func_kwargs={"job_name": job_name})
@@ -73,12 +88,7 @@ def get_jobruns_frame(job_name: str, message: str):
     unregister_btn = Button(
         description="Unregister", color="purple", icon=IconBin(), action=action, style=style
     )
-
-    text = Text(value=message, style=Style(margin=1))
-    table_jobruns = Table(data=data, max_rows=5)
-    buttons = Row(contents=[run_btn, stop_btn, unregister_btn, refresh_btn, text])
-    box = Column(contents=[title, buttons])
-    return [box, table_jobruns]
+    return [run_btn, stop_btn, unregister_btn, refresh_btn]
 
 
 # ACTIONS
@@ -87,7 +97,7 @@ def get_jobruns_frame(job_name: str, message: str):
 
 @webapp.action(target="jobruns")
 def run_job(job_name: str):
-    status = post_job_action(job_name, "run")
+    status = post_job_action(job_name, "enqueue")
     status_mapper = {
         True: f"Job {job_name} successfully enqueued",
         False: f"Job {job_name} is already running",
@@ -154,6 +164,23 @@ def format_jobs_data(data: List[Dict[str, Any]]):
 
 def get_jobruns_data(job_name: str):
     return mockapis.jobruns_raw.get(job_name, {}).get("data", [])
+
+
+def format_jobruns_data(data: List[Dict[str, Any]]):
+    formatter = {
+        "created_at": lambda x: x if not x else x[:19].replace("T", " "),
+        "finished_at": lambda x: x if not x else x[:19].replace("T", " "),
+    }
+    new_data = []
+    for row in data:
+        new_row = {}
+        for key, value in row.items():
+            new_key = key.replace("_", " ").title()
+            new_row[new_key] = value
+            if key in formatter:
+                new_row[new_key] = formatter[key](value)
+        new_data.append(new_row)
+    return new_data
 
 
 # UTILS
