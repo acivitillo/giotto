@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
+from copy import deepcopy
+from typing import Any, Dict, List, Literal, Optional
 
 from dominate.tags import (
     _input,
@@ -32,7 +33,6 @@ from .icons import (
     IconPreviousPage,
     IconSearch,
 )
-from copy import deepcopy
 
 
 class Select(Partial):
@@ -269,12 +269,16 @@ class Table(Partial):
 
 class Text(Partial):
     value: str
+    render_format: Optional[Literal["markdown", "html"]] = "markdown"
 
     def _to_tag(self):
-        tag = div(
-            raw(markdown(self.value, extensions=["fenced_code"])),
-            _class="prose max-w-none",
-        )
+        if self.render_format == "markdown":
+            text = raw(markdown(self.value, extensions=["fenced_code"]))
+        elif self.render_format == "html":
+            text = raw(self.value)
+        else:
+            text = self.value
+        tag = div(text, _class="prose max-w-none")
         return tag
 
 
