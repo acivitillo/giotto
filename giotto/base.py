@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from dominate.tags import div, html_tag, label
 from pydantic import BaseModel
@@ -42,21 +42,29 @@ class Style(BaseModel):
         }
         for key, value in kwargs_1.items():
             if value is not None:
-                tag.attributes["class"] += f" {key}-{value}"
+                self.add_to_class(tag, f"{key}-{value}")
         kwargs_2 = {
             "rounded-sm": self.rounded,
         }
         for key, value in kwargs_2.items():
             if value:
-                tag.attributes["class"] += f" {key}"
+                self.add_to_class(tag, f"{key}")
 
         if self.custom:
             if self.custom_remove:
-                tag.attributes["class"] = tag.attributes["class"].replace(
+                tag.attributes["class"] = tag.attributes.get("class", "").replace(
                     self.custom_remove, self.custom
                 )
             else:
-                tag.attributes["class"] += f" {self.custom}"
+                self.add_to_class(tag, f"{self.custom}")
+
+    @staticmethod
+    def add_to_class(tag: html_tag, new_value: str):
+        existing = tag.attributes.get("class")
+        if existing:
+            tag.attributes["class"] = f"{existing} {new_value}"
+        else:
+            tag.attributes["class"] = new_value
 
 
 class Partial(ABC, BaseModel):
@@ -66,15 +74,18 @@ class Partial(ABC, BaseModel):
     style: Optional[Style] = None
     label: Optional[str] = None
 
+    def __eq__(self, other: Any):
+        return self.render() == other.render()
+
     def to_tag(self) -> html_tag:
         tag = self._to_tag()
-        tag = self._update_tag(tag)
+        self._update_tag(tag)
         return tag
 
     def to_tags(self) -> List[html_tag]:
         tags = []
         for tag in self._to_tags():
-            tag = self._update_tag(tag)
+            self._update_tag(tag)
             tags.append(tag)
         return tags
 
@@ -86,7 +97,7 @@ class Partial(ABC, BaseModel):
     def _to_tags(self) -> List[html_tag]:
         return [self._to_tag()]
 
-    def _update_tag(self, tag: html_tag) -> html_tag:
+    def _update_tag(self, tag: html_tag):
         if self.id_:
             tag.attributes.update({"id": self.id_})
         if self.name:
@@ -95,12 +106,10 @@ class Partial(ABC, BaseModel):
             tag.attributes.update(self.action.to_dict())
         if self.style:
             self.style.apply(tag)
-        if self.label:
-            tag = label(self.label, tag, _class="ml-2")
-        return tag
 
     def render(self) -> str:
-        return self.to_tag().render()
+        html_list = [tag.render() for tag in self.to_tags()]
+        return "\n".join(html_list)
 
     def _repr_html_(self) -> str:
         return self.render()
