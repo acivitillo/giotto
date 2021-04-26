@@ -36,15 +36,16 @@ from .icons import (
 
 
 class Select(Partial):
+    _class = (
+        "border border-gray-300 text-gray-600 pl-5 bg-white"
+        " hover:border-gray-400 focus:outline-none"
+    )
+
     options: List[str]
     selected: str = ""
 
     def _to_tag(self):
-        class_ = (
-            "border border-gray-300 text-gray-600 pl-5 bg-white"
-            " hover:border-gray-400 focus:outline-none"
-        )
-        tag = select(_class=class_)
+        tag = select(_class=self._class)
         tag.add(option("", value=""))
         for text in self.options:
             option_ = option(text)
@@ -55,16 +56,14 @@ class Select(Partial):
 
 
 class MultiSelect(Partial):
+    _class = Select._class
+
     options: List[str]
     selected: List[str] = []
 
     def _to_tag(self):
-        class_ = (
-            "border border-gray-300 text-gray-600 pl-5 bg-white"
-            " hover:border-gray-400 focus:outline-none"
-        )
-        tag = select(_class=class_, multiple="multiple")
-        tag.add(option(_class="hidden"))
+        tag = select(_class=self._class, multiple="multiple")
+        tag.add(option("", value=""))
         for text in self.options:
             option_ = option(text)
             if text in self.selected:
@@ -74,16 +73,14 @@ class MultiSelect(Partial):
 
 
 class Input(Partial):
+    _class = Select._class
+
     placeholder: str = ""
     value: str = ""
     type_: str = "text"
 
     def _to_tag(self):
-        class_ = (
-            "border border-gray-300 text-gray-600 pl-5 bg-white"
-            " hover:border-gray-400 focus:outline-none"
-        )
-        tag = _input(type=self.type_, _class=class_, placeholder=self.placeholder)
+        tag = _input(type=self.type_, _class=self._class, placeholder=self.placeholder)
         if self.value:
             tag.attributes["value"] = self.value
         return tag
@@ -104,20 +101,24 @@ class Box(Partial):
 
 
 class Row(Partial):
+    _class = "flex flex-row items-center"
+
     contents: List[Partial]
 
     def _to_tag(self):
-        tag = div(_class="flex flex-row items-center")
+        tag = div(_class=self._class)
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
 
 
 class Column(Partial):
+    _class = "flex flex-col"
+
     contents: List[Partial]
 
     def _to_tag(self):
-        tag = div(_class="flex flex-col")
+        tag = div(_class=self._class)
         for item in self.contents:
             tag.add(item.to_tag())
         return tag
@@ -143,12 +144,12 @@ class Button(Partial):
 
 
 class ClickableIcon(Partial):
+    _class = "mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer"
+
     icon: Icon
 
     def _to_tag(self):
-        tag = div(
-            _class="mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer",
-        )
+        tag = div(_class=self._class)
         tag.add(self.icon.to_tag())
         return tag
 
@@ -268,6 +269,8 @@ class Table(Partial):
 
 
 class Text(Partial):
+    _class = "prose max-w-none"
+
     value: str
     render_format: Optional[Literal["markdown", "html"]] = "markdown"
 
@@ -278,7 +281,7 @@ class Text(Partial):
             text = raw(self.value)
         else:
             text = self.value
-        tag = div(text, _class="prose max-w-none")
+        tag = div(text, _class=self._class)
         return tag
 
 
