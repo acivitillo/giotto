@@ -74,8 +74,11 @@ class Partial(ABC, BaseModel):
     style: Optional[Style] = None
     label: Optional[str] = None
 
-    def __eq__(self, other: Any):
+    def __eq__(self, other: Any) -> bool:
         return self.render() == other.render()
+
+    def __str__(self) -> str:
+        return self.render()
 
     def to_tag(self) -> html_tag:
         tag = self._to_tag()

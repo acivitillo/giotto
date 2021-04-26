@@ -46,6 +46,11 @@ def test_partial___eq__():
     assert CustomPartial(id_="partial_1") != CustomPartial(id_="partial_2")
 
 
+def test_partial___str__():
+    partial = CustomPartial()
+    assert str(partial) == "<div></div>"
+
+
 def test_partial_to_tag():
     partial = CustomPartial()
     assert partial.to_tag().render() == div().render()
