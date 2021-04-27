@@ -4,7 +4,8 @@ import os
 import urllib3
 
 from giotto.app import App
-from giotto.elements import Box, Text
+from giotto.app import Style
+from giotto.elements import Text
 from giotto.navigation import Sidebar
 
 from . import mockapis
@@ -26,7 +27,7 @@ webapp = App(
 def index():
     proxy_url = os.getenv("HTTP_PROXY", "")
     readme_md = get_readme(owner="acivitillo", repo="giotto", proxy_url=proxy_url, path="README.md")
-    text = Box(contents=[Text(value=readme_md)], centered=True)
+    text = Text(value=readme_md, style=Style(margin=5))
     return [text]
 
 
@@ -42,7 +43,6 @@ def get_readme(owner: str, repo: str, path: str, proxy_url: str = "", token: str
         headers["Authorization"] = f"token {token}"
     resp = con.request("GET", url, headers=headers)
     data = json.loads(resp.data)
-    print("here", path)
     out = ""
     for item in data:
         if item["name"] == path:
