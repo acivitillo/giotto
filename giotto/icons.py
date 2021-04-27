@@ -1,4 +1,5 @@
 from dominate.svg import path, svg
+from dominate.tags import html_tag
 
 from .base import Partial
 
@@ -8,7 +9,7 @@ class Icon(Partial):
 
 
 class IconHMenu(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             xmlns="http://www.w3.org/2000/svg",
             fill="none",
@@ -26,7 +27,7 @@ class IconHMenu(Icon):
 
 
 class IconDownarrow(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-2 h-2 m-4 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -48,7 +49,7 @@ class IconDownarrow(Icon):
 
 
 class IconFiles(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="h-5 w-5", viewBox="0 0 24 24", fill="none", xmlns="http://www.w3.org/2000/svg"
         )
@@ -70,7 +71,7 @@ class IconFiles(Icon):
 
 
 class IconSearch(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-4 h-5 m-3 absolute top-0 right-0 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -88,7 +89,7 @@ class IconSearch(Icon):
 
 
 class IconDetails(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="m-auto w-6 h-6",
             xmlns="http://www.w3.org/2000/svg",
@@ -107,7 +108,7 @@ class IconDetails(Icon):
 
 
 class IconPlay(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-auto h-6 m-1 inline-block pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -127,7 +128,7 @@ class IconPlay(Icon):
 
 
 class IconStop(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-auto h-6 m-1 inline-block",
             xmlns="http://www.w3.org/2000/svg",
@@ -147,7 +148,7 @@ class IconStop(Icon):
 
 
 class IconBin(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-auto h-6 m-1 inline-block",
             xmlns="http://www.w3.org/2000/svg",
@@ -169,7 +170,7 @@ class IconBin(Icon):
 
 
 class IconFirstPage(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-6 h-6 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -189,7 +190,7 @@ class IconFirstPage(Icon):
 
 
 class IconPreviousPage(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-6 h-6 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -208,7 +209,7 @@ class IconPreviousPage(Icon):
 
 
 class IconNextPage(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-6 h-6 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -227,7 +228,7 @@ class IconNextPage(Icon):
 
 
 class IconLastPage(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-6 h-6 m-1 pointer-events-none",
             xmlns="http://www.w3.org/2000/svg",
@@ -247,7 +248,7 @@ class IconLastPage(Icon):
 
 
 class IconRefresh(Icon):
-    def _to_tag(self):
+    def _to_tag(self) -> html_tag:
         tag = svg(
             _class="w-auto h-6 m-1 inline-block",
             xmlns="http://www.w3.org/2000/svg",
