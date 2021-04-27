@@ -86,20 +86,6 @@ class Input(Partial):
         return tag
 
 
-class Box(Partial):
-    contents: List[Partial]
-    centered: bool = False
-
-    def _to_tag(self):
-        style = "container"
-        if self.centered:
-            style += " mx-auto w-full 2xl:w-1/2"
-        tag = div(_class=style)
-        for item in self.contents:
-            tag.add(item.to_tag())
-        return tag
-
-
 class Row(Partial):
     _class = "flex flex-row items-center"
 
@@ -129,14 +115,18 @@ class Button(Partial):
     icon: Optional[Icon]
     color: str = "blue"
 
-    def _to_tag(self):
+    @property
+    def _class(self) -> str:
         _class = (
             f"uppercase bg-{self.color}-400 px-5"
             f" items-center font-medium text-black max-w-max shadow-sm cursor-pointer"
             f" focus:bg-{self.color}-600 focus:outline-none focus:text-white"
             f" hover:shadow-lg hover:bg-{self.color}-600 hover:text-white"
         )
-        tag = button(_class=_class)
+        return _class
+
+    def _to_tag(self):
+        tag = button(_class=self._class)
         if self.icon:
             tag.add(self.icon.to_tag())
         tag.add(span(self.description))
@@ -272,61 +262,15 @@ class Text(Partial):
     _class = "prose max-w-none"
 
     value: str
-    render_format: Optional[Literal["markdown", "html"]] = "markdown"
+    render_format: Literal["markdown", "html"] = "markdown"
 
     def _to_tag(self):
         if self.render_format == "markdown":
             text = raw(markdown(self.value, extensions=["fenced_code"]))
-        elif self.render_format == "html":
-            text = raw(self.value)
         else:
-            text = self.value
+            text = raw(self.value)
         tag = div(text, _class=self._class)
         return tag
-
-
-class Tab(Partial):
-    name: str
-    body: Partial
-
-    def _to_tag(self):
-        return self.body._to_tag()
-
-
-class TabContainer(Partial):
-    tabs: List[Tab]
-    # NEEDS TO BE CALCULATED SOMEHOW
-    clicked: Tab
-
-    def _to_tag(self):
-        _tag = div(_class="flex-1 ml-5 mt-10")
-        _style = div(_style="border-bottom: 2px solid #eaeaea")
-        _ul = ul(_class="flex cursor-pointer")
-        # DEFAULT FIRST ONE CLICKED
-        if self.clicked == None:
-            self.clicked = self.tabs[0]
-            clicked_id = 0
-        else:
-            clicked_id = self.tabs.index(self.clicked)
-        for index, tab in enumerate(self.tabs):
-            if clicked_id == index:
-                _ul.add(li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg"))
-            else:
-                _ul.add(
-                    li(tab.name, _class="py-2 px-6 bg-white rounded-t-lg text-gray-500 bg-gray-200")
-                )
-        _style.add(_ul)
-        _tag.add(_style)
-
-
-# USER CODE
-# tab_1 = Tab(name='apple', body=Table())
-# tab_2 = Tab(name='orange', body=Table())
-# tab_3 = Tab(name='banana', body=Hbox(values=[Button(name='add', color='green'),
-#                                              Button(name='remove', color='red'),
-#                                              Table()]))
-
-# tab_container_1 = TabContainer(tabs=[tab1, tab2, tab3])
 
 
 class ConnectedDropdowns(Partial):
@@ -340,10 +284,11 @@ class ConnectedDropdowns(Partial):
 
             df = DataFrame(data)
 
-            for key, values in self.filters.items():
+            for key in self.data.keys():
                 data[key] = df.to_dict("list")[key]
-                if values:
-                    values = [values] if isinstance(values, str) else list(values)
+                filter_value = self.filters.get(key)
+                if filter_value:
+                    values = [filter_value]
                     df = df.query(f"{key} in {values}")
 
         return data
@@ -355,11 +300,7 @@ class ConnectedDropdowns(Partial):
         components = []
         data = self.filter_data()
         for name, values in data.items():
-            tag = Select(
-                options=list(set(values)),
-                selected=self.filters.get(name, ""),
-                # label=name.capitalize(),
-                name=name,
-            ).to_tag()
+            options = sorted(list(set(values)))
+            tag = Select(options=options, selected=self.filters.get(name, ""), name=name).to_tag()
             components.append(tag)
         return components
