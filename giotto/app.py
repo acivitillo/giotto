@@ -8,8 +8,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, validator
 
-from giotto.base import HXAction, Partial, Style
-from giotto.navigation import Sidebar, TopBar
+from .base import HXAction, Partial, Style
+from .navigation import Sidebar, TopBar
 
 
 class AppFunction(BaseModel):
@@ -97,7 +97,7 @@ class Site(BaseModel):
     content: Any = div()
 
     @property
-    def head(self) -> str:
+    def head(self) -> html_tag:
         h = head()
         h.add(script(src="/giotto-statics/main.js", defer=True))
         h.add(script(src="https://unpkg.com/htmx.org@1.2.1"))
@@ -105,7 +105,7 @@ class Site(BaseModel):
         return h
 
     @property
-    def body(self) -> str:
+    def body(self) -> html_tag:
         b = body()
         if self.topbar:
             b.add(self.topbar.to_tag())
@@ -113,11 +113,11 @@ class Site(BaseModel):
         return b
 
     @property
-    def body_container(self):
-        m = main(self.content, _class="pt-8 px-8 overflow-x-auto flex-1")
+    def body_container(self) -> html_tag:
         container = div(_class="flex", _style="height: 95vh")
         if self.sidebar:
             container.add(self.sidebar.to_tag())
+        m = main(self.content, _class="pt-8 px-8 overflow-x-auto flex-1")
         container.add(m)
         return container
 
