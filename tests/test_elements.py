@@ -14,10 +14,7 @@ from ..giotto.elements import (
     Text,
 )
 from ..giotto.icons import Icon
-
-
-def clear_string(s: str):
-    return s.replace("\n", "").replace(" ", "")
+from .conftest import clear_string
 
 
 @pytest.fixture

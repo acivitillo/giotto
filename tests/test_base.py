@@ -1,7 +1,8 @@
-from ..giotto.base import HXAction, Partial, Style
 from dominate.tags import div
-
 import pytest
+
+from ..giotto.base import HXAction, Style
+from .conftest import CustomPartial
 
 
 params_hx_action_to_dict = [
@@ -34,11 +35,6 @@ def test_style_apply(initial_state, style, expected):
     style = Style(**style)
     style.apply(initial_state)
     assert initial_state.render() == expected.render()
-
-
-class CustomPartial(Partial):
-    def _to_tag(self):
-        return div()
 
 
 def test_partial___eq__():
