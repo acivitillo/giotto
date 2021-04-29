@@ -1,7 +1,7 @@
 from dominate.tags import div
 import pytest
 
-from ..giotto.base import Partial
+from giotto.base import Partial
 
 
 def clear_string(s: str):

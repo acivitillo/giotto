@@ -1,7 +1,7 @@
 from dominate.tags import div
 import pytest
 
-from ..giotto.base import HXAction, Style
+from giotto.base import HXAction, Style
 from .conftest import CustomPartial
 
 

@@ -1,4 +1,4 @@
-from ..giotto.icons import (
+from giotto.icons import (
     IconHMenu,
     IconDownarrow,
     IconFiles,

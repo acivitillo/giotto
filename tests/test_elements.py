@@ -2,7 +2,7 @@ from dominate.svg import svg
 from dominate.tags import div
 import pytest
 
-from ..giotto.elements import (
+from giotto.elements import (
     Button,
     ClickableIcon,
     Column,
@@ -13,7 +13,7 @@ from ..giotto.elements import (
     Select,
     Text,
 )
-from ..giotto.icons import Icon
+from giotto.icons import Icon
 from .conftest import clear_string
 
 

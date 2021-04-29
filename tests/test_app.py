@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest
 
-from ..giotto.app import App, AppFunction, BaseApp, Frame, MainApp, Site
+from giotto.app import App, AppFunction, BaseApp, Frame, MainApp, Site
 from .conftest import clear_string
 
 
