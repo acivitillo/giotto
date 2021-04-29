@@ -63,7 +63,7 @@ jobs:
     - name: Install giotto
       if: always()
       run: |
-        pip install .
+        pip install . --user --no-cache-dir
 
     - name: Test with pytest
       if: always()
