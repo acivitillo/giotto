@@ -10,7 +10,10 @@ class TopBar(BaseModel):
     value: str = "Site Name"
 
     def to_tag(self):
-        tag = div(_class="flex-1 flex flex-col overflow-hidden", _style="height: 5vh",)
+        tag = div(
+            _class="flex-1 flex flex-col overflow-hidden",
+            _style="height: 5vh",
+        )
         n = nav(_class="p-4 flex justify-between bg-dark h-full border-cgrey_200")
         uleft = ul(_class="flex items-center")
         l = li(_class="h-6 w-8")
@@ -69,7 +72,11 @@ class Sidebar(BaseModel):
                             style += " selected"
                     else:
                         style += " hidden"
-                    lev2 = a(_class=style, href=subitem["href"], data_collapse_target="leveltwo",)
+                    lev2 = a(
+                        _class=style,
+                        href=subitem["href"],
+                        data_collapse_target="leveltwo",
+                    )
                     _span = span(subitem["text"], _class="mx-4")
                     lev2.add(_span)
                     lev1.add(lev2)
