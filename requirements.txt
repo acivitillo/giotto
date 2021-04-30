@@ -2,7 +2,7 @@ aiofiles==0.6.0
 dominate==2.6.0
 fastapi==0.63.0
 markdown==3.3.3
-pandas==1.1.0
+pandas==1.2.4
 python-multipart==0.0.5
 uvicorn==0.13.4
 wheel==0.36.2
