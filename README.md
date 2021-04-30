@@ -1,6 +1,17 @@
 # Giotto
 
+<p>
+<a href="https://github.com/acivitillo/giotto/actions?query=workflow%3ABuild" target="_blank">
+    <img src="https://github.com/acivitillo/giotto/workflows/Build/badge.svg" alt="Build">
+</a>
+
+<a href="https://github.com/psf/black" target="_blank">
+    <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Build">
+</a>
+</p>
+
 ![alt-text](https://github.com/acivitillo/giotto/blob/main/docs/giotto.gif)
+
 ## Running the examples
 
 Please make sure that you have `HTTP_PROXY` in your environment variables if needed.
