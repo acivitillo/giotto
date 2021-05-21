@@ -1,5 +1,6 @@
 import inspect
 from typing import Any, Callable, Dict, List, Literal, Optional
+from urllib.parse import quote
 
 from dominate import document
 from dominate.tags import body, div, form, head, html_tag, input_, link, main, script
@@ -26,11 +27,11 @@ class AppFunction(BaseModel):
     def get_hx_action(self, func_kwargs: Dict[str, str] = None) -> HXAction:
         """Get HXAction based on instance attributes and function keyword arguments."""
         target = f"#{self.target}" if self.target else None
+        kwargs = ""
         if func_kwargs:
-            kwargs = "&".join([f"{k}={v}" for k, v in func_kwargs.items()])
-            kwargs = f"&{kwargs}"
-        else:
-            kwargs = ""
+            for k, v in func_kwargs.items():
+                quoted_value = quote(str(v))
+                kwargs += f"&{k}={quoted_value}"
         return HXAction(url=f"{self.prefix}/receiver?func_name={self.id_}{kwargs}", target=target)
 
     def run(self, **func_kwargs) -> Any:
