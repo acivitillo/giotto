@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional
 from urllib.parse import quote
 
 from dominate import document
-from dominate.tags import body, div, form, head, html_tag, input_, link, main, script
+from dominate.tags import body, div, form, head, html_tag, link, main, script
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -80,7 +80,7 @@ class Frame(AppFunction):
     def to_tag(self, **func_kwargs) -> html_tag:
         """Return full frame in tag form."""
         tags = self.to_tags(**func_kwargs)
-        tag = eval(self.type_)
+        tag = form if self.type_ == "form" else div
         tag = tag(tags, _id=self.id_, _class=self.class_, autocomplete="off")
         return tag
 
