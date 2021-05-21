@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 from giotto.app import App, AppFunction, BaseApp, Frame, MainApp, Site
-from .conftest import clear_string
+from ..conftest import clear_string
 
 
 @pytest.fixture
@@ -33,12 +33,6 @@ def frame(frame_func):
 def site():
     site = Site()
     return site
-
-
-@pytest.fixture()
-def base_app():
-    base_app = BaseApp(app=FastAPI())
-    return base_app
 
 
 @pytest.fixture

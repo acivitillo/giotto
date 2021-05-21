@@ -2,7 +2,7 @@ from dominate.tags import div
 import pytest
 
 from giotto.base import HXAction, Style
-from .conftest import CustomPartial
+from ..conftest import CustomPartial
 
 
 params_hx_action_to_dict = [

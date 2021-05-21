@@ -14,7 +14,7 @@ from giotto.elements import (
     Text,
 )
 from giotto.icons import Icon
-from .conftest import clear_string
+from ..conftest import clear_string
 
 
 @pytest.fixture

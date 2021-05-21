@@ -1,6 +1,8 @@
+from fastapi import FastAPI
 from dominate.tags import div
 import pytest
 
+from giotto.app import BaseApp
 from giotto.base import Partial
 
 
@@ -16,3 +18,9 @@ class CustomPartial(Partial):
 @pytest.fixture
 def partial():
     return CustomPartial()
+
+
+@pytest.fixture()
+def base_app():
+    base_app = BaseApp(app=FastAPI())
+    return base_app
