@@ -9,36 +9,40 @@ from .icons import IconFiles, IconHMenu
 class TopBar(BaseModel):
     value: str = "Site Name"
 
-    def to_tag(self):
-        tag = div(
-            _class="flex-1 flex flex-col overflow-hidden",
-            _style="height: 5vh",
-        )
-        n = nav(_class="p-4 flex justify-between bg-dark h-full border-cgrey_200")
-        uleft = ul(_class="flex items-center")
-        l = li(_class="h-6 w-8")
+    @property
+    def _ul_left(self):
         icon = IconHMenu().to_tag()
-        mlink = a(href="#")
-        mlink.add(icon)
-        l.add(mlink)
-        uleft.add(l)
-        ucenter = ul(_class="flex items-center")
-        l = li()
-        l.add(h1(self.value, _class="pl-8 lg:pl-0 text-white font-bold"))
-        ucenter.add(l)
-        uright = ul(_class="flex items-center")
-        l = li(_class="h-10 w-10")
-        im = img(
+        mlink = a(icon, href="#")
+        li_ = li(mlink, _class="h-6 w-8")
+        ul_left = ul(li_, _class="flex items-center")
+        return ul_left
+
+    @property
+    def _ul_center(self):
+        h1_ = h1(self.value, _class="pl-8 lg:pl-0 text-white font-bold")
+        li_ = li(h1_)
+        ul_center = ul(li_, _class="flex items-center")
+        return ul_center
+
+    @property
+    def _ul_right(self):
+        img_ = img(
             _class="h-full w-full rounded-full mx-auto",
-            src="https://avatars.githubusercontent.com/u/54931660?s=400&u=dcf5550498aee3550f2b2f835345d802fabe1833&v=4&_sm_au_=iNVf4trk1MFNLSNnVsBFjK664v423",
+            src=(
+                "https://avatars.githubusercontent.com/u/54931660?s=400&u=dcf55"
+                "50498aee3550f2b2f835345d802fabe1833&v=4&_sm_au_=iNVf4trk1MFNLS"
+                "NnVsBFjK664v423"
+            ),
             alt="profile boss",
         )
-        l.add(im)
-        uright.add(l)
-        n.add(uleft)
-        n.add(ucenter)
-        n.add(uright)
-        tag.add(n)
+        li_ = li(img_, _class="h-10 w-10")
+        ul_right = ul(li_, _class="flex items-center")
+        return ul_right
+
+    def to_tag(self):
+        uls = (self._ul_left, self._ul_center, self._ul_right)
+        nav_ = nav(*uls, _class="p-4 flex justify-between bg-dark h-full border-cgrey_200")
+        tag = div(nav_, _class="flex-1 flex flex-col overflow-hidden", _style="height: 5vh")
         return tag
 
 
