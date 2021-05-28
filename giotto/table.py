@@ -1,3 +1,5 @@
+# NOTE: I split and organized the code but it's still pretty hard to test
+
 from __future__ import annotations
 from typing import Any, Dict, List, Union
 
@@ -8,10 +10,8 @@ from .icons import IconFirstPage, IconLastPage, IconNextPage, IconPreviousPage, 
 
 
 class Filters:
-    _class = "relative inline-flex"
-
-    def __get__(self, obj: Table, objtype: Any = None) -> html_tag:
-        tag = div(_class=self._class)
+    def __get__(self, obj: Any, objtype: Any = None) -> html_tag:
+        tag = div(_class="relative inline-flex")
         input_ = _input(
             type="search",
             _class=(
@@ -28,10 +28,8 @@ class Filters:
 
 
 class Head:
-    _class = "bg-primary text-white"
-
     def __get__(self, obj: Table, objtype: Any = None) -> html_tag:
-        thead_ = thead(_class=self._class)
+        thead_ = thead(_class="bg-primary text-white")
         if obj.columns:
             tr_ = tr(_class="bg-dark text-white")
             for column in obj.columns:
@@ -67,8 +65,6 @@ class Body:
 
 
 class Pagination:
-    _class = "flex justify-between items-center px-2 py-2"
-
     def __get__(self, obj: Table, objtype: Any = None) -> html_tag:
         total = span(obj.total_rows, data_table_target="total")
         desc = div(total, span(" results"), _class="text-gray-500")
@@ -100,7 +96,8 @@ class Pagination:
         class_ = "relative z-0 inline-flex shadow-sm -space-x-px"
         buttons = nav(first_button, prev_button, next_button, last_button, _class=class_)
 
-        div_ = div(desc, buttons, _class=self._class)
+        class_ = "flex justify-between items-center px-2 py-2"
+        div_ = div(desc, buttons, _class=class_)
         return div_
 
 
@@ -123,13 +120,14 @@ class Table(Partial):
         return len(self.data)
 
     def _to_tag(self) -> html_tag:
+        table_ = table(self._thead, self._tbody, _class="w-full table-fixed")
+        div_table = div(table_, _class="overflow-x-auto")
         tag = div(
+            self._filters,
+            div_table,
+            self._pagination,
             _class="shadow",
             data_controller="table",
             data_table_max_page_rows_value=self.max_rows,
         )
-        div_table = div(_class="overflow-x-auto")
-        table_ = table(self._thead, self._tbody, _class="w-full table-fixed")
-        div_table.add(table_)
-        tag.add(self._filters, div_table, self._pagination)
         return tag
